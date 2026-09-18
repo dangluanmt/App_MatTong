@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bách Khoa Toàn Thư Mật Tông - Pháp Khí & Bổn Tôn</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #080c14; color: #f1f5f9; }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #d97706; }
+    .node-transition { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-950/25 via-[#0a0f1d] to-[#050811]">
+
+  <!-- Header -->
+  <header class="border-b border-amber-500/20 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-center md:text-left">
+        <div class="flex items-center justify-center md:justify-start gap-2.5">
+          <span class="text-amber-400 text-2xl">☸</span>
+          <h1 class="font-cinzel text-xl sm:text-2xl font-bold tracking-wider text-amber-400">MẬT TÔNG KIM CƯƠNG THỪA</h1>
+        </div>
+      </div>
+
+      <!-- View Toggle, System Selector & Actions -->
+      <div class="flex flex-wrap items-center justify-center gap-3 w-full md:w-auto">
+        <!-- Chuyển đổi giao diện (Lưới / Mạn-đà-la) -->
+        <div class="bg-slate-900 border border-amber-500/40 p-1 rounded-xl flex items-center shadow-inner">
+          <button onclick="setViewMode('grid')" id="viewModeGrid" class="px-3 py-1 text-xs rounded-lg font-semibold bg-amber-500 text-slate-950 transition flex items-center gap-1">
+            <span>⊞</span> Lưới Thẻ
+          </button>
+          <button onclick="setViewMode('mandala')" id="viewModeMandala" class="px-3 py-1 text-xs rounded-lg font-semibold text-slate-300 hover:text-white transition flex items-center gap-1">
+            <span>☸</span> Mạn-đà-la
+          </button>
+        </div>
+
+        <!-- Phân hệ -->
+        <div id="systemSelectorWrap" class="bg-slate-900 border border-slate-700/80 p-1 rounded-xl flex items-center">
+          <button onclick="setSystem('all')" id="sys-all" class="sys-btn px-3 py-1 text-xs rounded-lg font-semibold bg-amber-500 text-slate-950 transition">Tất Cả</button>
+          <button onclick="setSystem('phap_khi')" id="sys-phapkhi" class="sys-btn px-3 py-1 text-xs rounded-lg font-semibold text-slate-300 hover:text-white transition">Pháp Khí</button>
+          <button onclick="setSystem('deity')" id="sys-deity" class="sys-btn px-3 py-1 text-xs rounded-lg font-semibold text-slate-300 hover:text-white transition">Tôn Tượng</button>
+        </div>
+
+        <button onclick="document.getElementById('batchFileInput').click()" class="text-xs font-semibold px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl transition flex items-center gap-1.5 shadow">
+          📁 Nạp Loạt Ảnh
+        </button>
+        <input type="file" id="batchFileInput" multiple accept="image/*" class="hidden" onchange="handleBatchUpload(event)" />
+
+        <div class="relative flex-1 md:w-56">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Tìm kiếm danh xưng..." 
+            class="w-full bg-slate-900/90 text-sm border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition shadow-inner"
+          />
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div id="categoryBar" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 overflow-x-auto no-scrollbar border-t border-slate-800/60">
+      <div class="flex space-x-2 py-1" id="categoryTabs"></div>
+    </div>
+  </header>
+
+  <!-- Banner -->
+  <div id="topBanner" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+    <div class="bg-amber-950/20 border border-amber-500/20 rounded-xl px-4 py-2.5 flex flex-col sm:flex-row items-center justify-between text-xs text-amber-200/80 gap-2">
+      <div class="flex items-center gap-2">
+        <span>🔍</span>
+        <span id="bannerText"><b>Mẹo xem ảnh:</b> Trong bảng chi tiết, <b>nhấp thẳng vào hình ảnh</b> để xem phóng to toàn màn hình sắc nét[cite: 3].</span>
+      </div>
+      <button onclick="this.parentElement.remove()" class="text-slate-500 hover:text-white px-2">✕</button>
+    </div>
+  </div>
+
+  <!-- VIEW 1: LƯỚI THẺ TRUYỀN THỐNG (GRID VIEW) -->
+  <main id="gridViewContainer" class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8">
+    <div class="text-xs text-slate-400 mb-4 flex justify-between items-center" id="statusCount"></div>
+    <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+  </main>
+
+  <!-- VIEW 2: MẠN-ĐÀ-LA KHÔNG GIAN TƯƠNG TÁC (MANDALA VIEW) -->
+  <main id="mandalaViewContainer" class="hidden flex-1 w-full flex-col items-center justify-between overflow-hidden relative min-h-[720px] py-4">
+    <div class="z-20 flex items-center gap-3 bg-slate-900/80 border border-slate-700/70 backdrop-blur px-4 py-2 rounded-2xl shadow-xl">
+      <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider">Góc Xoay Đàn Tràng:</span>
+      <button onclick="rotateDial(-45)" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-amber-600 text-amber-300 hover:text-white text-xs font-semibold border border-slate-700 transition">↺ -45°</button>
+      <button onclick="resetDial()" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">0° Chuẩn Định</button>
+      <button onclick="rotateDial(45)" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-amber-600 text-amber-300 hover:text-white text-xs font-semibold border border-slate-700 transition">↻ +45°</button>
+    </div>
+
+    <div class="relative flex-1 w-full flex items-center justify-center">
+      <div id="mandalaWheel" class="relative w-[680px] h-[680px] rounded-full flex items-center justify-center transition-transform duration-700 ease-out">
+        <svg id="mandalaSvg" class="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="-340 -340 680 680">
+          <circle cx="0" cy="0" r="85" fill="none" stroke="#d4af37" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.35" />
+          <circle cx="0" cy="0" r="175" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.3" />
+          <circle cx="0" cy="0" r="270" fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.3" />
+
+          <line x1="-300" y1="0" x2="300" y2="0" stroke="#d4af37" stroke-width="0.8" opacity="0.2" />
+          <line x1="0" y1="-300" x2="0" y2="300" stroke="#d4af37" stroke-width="0.8" opacity="0.2" />
+
+          <text x="305" y="4" fill="#60a5fa" font-size="11" font-weight="bold" opacity="0.8" text-anchor="start">ĐÔNG</text>
+          <text x="0" y="315" fill="#facc15" font-size="11" font-weight="bold" opacity="0.8" text-anchor="middle">NAM</text>
+          <text x="-305" y="4" fill="#f87171" font-size="11" font-weight="bold" opacity="0.8" text-anchor="end">TÂY</text>
+          <text x="0" y="-305" fill="#4ade80" font-size="11" font-weight="bold" opacity="0.8" text-anchor="middle">BẮC</text>
+
+          <g id="rayGroup"></g>
+        </svg>
+
+        <div id="nodesContainer" class="absolute inset-0 w-full h-full"></div>
+      </div>
+    </div>
+
+    <!-- Inspector -->
+    <div class="w-full max-w-xl px-4 z-20">
+      <div id="inspectorCard" class="bg-slate-900/90 border border-amber-500/40 backdrop-blur-md rounded-2xl p-4 shadow-2xl flex items-center justify-between transition-all duration-300">
+        <div class="flex items-center gap-3.5">
+          <div id="inspAvatar" class="w-12 h-12 rounded-xl bg-slate-800 border border-amber-500/50 flex items-center justify-center text-lg font-bold text-amber-300 overflow-hidden">☸</div>
+          <div>
+            <h3 id="inspName" class="text-sm sm:text-base font-bold text-amber-300">Chưa chọn vị Bổn Tôn</h3>
+            <p id="inspMeta" class="text-xs text-slate-400 italic">Rê chuột hoặc chạm vào nốt trên Mạn-đà-la để kích hoạt tia liên kết</p>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-1.5">
+          <span id="inspRole" class="text-[11px] font-semibold px-2.5 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-500/30 rounded-lg">TÂM ĐIỂM</span>
+          <button id="inspDetailBtn" class="text-xs text-amber-400 hover:text-white font-medium underline hidden">Chi tiết ➔</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <input type="file" id="singleFileInput" accept="image/*" class="hidden" onchange="handleSingleUpload(event)" />
+
+  <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+    <p>Khảo cứu theo hệ thống Kinh điển, Nghi quỹ Kim Cương Thừa, Mạn-đà-la & Khảo luận Pháp Khí Mật Tông[cite: 3].</p>
+    <p class="mt-1 text-slate-600">Dữ liệu hình ảnh được lưu trữ an toàn trong bộ nhớ IndexedDB của trình duyệt[cite: 3].</p>
+  </footer>
+
+  <!-- Modal Chi Tiết -->
+  <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-6 z-50 overflow-y-auto">
+    <div class="bg-slate-900 border border-amber-500/30 max-w-3xl w-full rounded-2xl p-6 sm:p-8 relative max-h-[92vh] overflow-y-auto shadow-2xl shadow-amber-950/40 custom-scrollbar">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 p-2 rounded-full transition leading-none">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Lightbox Zoom Modal -->
+  <div id="imageZoomModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[60] p-2 sm:p-6 cursor-zoom-out" onclick="closeZoomModal()">
+    <button onclick="closeZoomModal()" class="absolute top-4 right-4 text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 p-2.5 rounded-full transition leading-none z-10 shadow-lg">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    <div class="relative max-w-5xl max-h-[92vh] flex items-center justify-center" onclick="event.stopPropagation()">
+      <img id="zoomedImageDisplay" src="" alt="Zoomed" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl border border-amber-500/40 select-none" />
+      <span class="absolute bottom-2 bg-black/75 text-amber-300 text-[11px] px-3.5 py-1 rounded-full border border-amber-500/30 pointer-events-none shadow backdrop-blur-sm">
+        Nhấp ra ngoài hoặc bấm phím ESC để thu nhỏ
+      </span>
+    </div>
+  </div>
+
+  <script>
+    const VAJRAYANA_MASTER_DATA = [
+      // --- PHÁP KHÍ (phapkhi/) ---
+      {"id": "vajra", "system": "phap_khi", "name": {"vietnamese": "Kim Cang Chùy (Chày Kim Cương)", "sanskrit": "Vajra", "tibetan": "Dorje"}, "category_id": "core", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Dorje_symbol.jpg/500px-Dorje_symbol.jpg", "polarity": "Dương (Phương tiện thiện xảo)", "element": "Kim / Sắt thiên thạch Thokcha", "classification": "Tức tai, Tăng ích, Hoài cảm, Hàng phục", "symbolism": {"core_meaning": "Tượng trưng cho bản tánh kim cương bất hoại của tâm Bồ Đề, đập tan mọi tà kiến vô minh.", "structural_breakdown": [{"part": "Viên châu trung tâm", "meaning": "Pháp thân chân như vô trụ."}, {"part": "Đài sen 8 cánh hai đầu", "meaning": "Bát Đại Bồ Tát và Bát Bồ Tát Nữ."}, {"part": "5 chấu kim cương", "meaning": "Ngũ Trí Như Lai chuyển hóa ngũ độc."}]}, "ritual_usage": {"holding_hand": "Tay phải (Right hand)", "mudra": "Cầm ngang ngực tim, chùy dựng đứng.", "practical_application": "Phối hợp với Kim Cang Linh trong mọi khóa lễ Mật thừa."}, "associated_deities": ["Vajrasattva", "Vajrapani", "Padmasambhava"]},
+      {"id": "ghanta", "system": "phap_khi", "name": {"vietnamese": "Kim Cang Linh (Chuông Kim Cương)", "sanskrit": "Ghaṇṭā", "tibetan": "Drilbu"}, "category_id": "core", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Tibetan_Bell_and_Dorje.jpg/500px-Tibetan_Bell_and_Dorje.jpg", "polarity": "Âm (Trí tuệ Bát-nhã)", "element": "Hợp kim chuông 7-8 kim loại", "classification": "Tức tai / Khai thị Tánh Không", "symbolism": {"core_meaning": "Biểu tượng tối cao của Trí tuệ Tánh Không. Âm thanh chuông ngân rồi tan biến biểu thị chân lý duyên khởi vô ngã.", "structural_breakdown": [{"part": "Cán chuông nửa chùy", "meaning": "Hợp nhất Trí tuệ và Phương tiện."}, {"part": "Mặt Bát Nhã Phật Mẫu trên cán", "meaning": "Mẹ hiền sinh ra chư Phật."}, {"part": "Thân chuông & Quả lắc", "meaning": "Âm vang thức tỉnh tâm thức."}]}, "ritual_usage": {"holding_hand": "Tay trái (Left hand)", "mudra": "Cầm ngang hông hoặc ngực trái, lắc nhịp nhàng cùng chùy.", "practical_application": "Cúng dường diệu âm Bát Nhã, triệu thỉnh chư Phật Bồ Tát."}, "associated_deities": ["Prajnaparamita", "Vajradhara", "Tara"]},
+      {"id": "vishvavajra", "system": "phap_khi", "name": {"vietnamese": "Yết Ma Chùy (Chùy Thập Tự)", "sanskrit": "Viśvavajra", "tibetan": "Dorje Gyatram"}, "category_id": "core", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Dorje_symbol.jpg/500px-Dorje_symbol.jpg", "polarity": "Thành Tựu Nghiệp Tự Tại", "element": "Kim loại tứ đại bất hoại", "classification": "Định vị trung tâm và bốn phương đàn tràng", "symbolism": {"core_meaning": "Hai chùy Kim Cang đan chéo vuông góc, biểu thị nền tảng bất động tuyệt đối của vũ trụ và sự nghiệp cứu độ vô ngại.", "structural_breakdown": [{"part": "Tâm điểm giao thoa", "meaning": "Bản thể bất nhị, trục bất động của Mạn-đà-la."}, {"part": "Bốn đầu chùy", "meaning": "Tứ Chủng Tịnh Hạnh: Tức tai, Tăng ích, Hoài cảm, Hàng phục."}]}, "ritual_usage": {"holding_hand": "Đặt tại đáy pháp tọa hoặc ấn triện", "mudra": "Khắc dưới đáy các pho tượng hoặc chày Phổ Ba.", "practical_application": "Làm nền móng phong ấn Mạn-đà-la."}, "associated_deities": ["Amoghasiddhi", "Green Tara"]},
+      {"id": "phurba", "system": "phap_khi", "name": {"vietnamese": "Kim Cang Phổ Ba (Phổ Ba Chùy)", "sanskrit": "Kīla / Kīlaya", "tibetan": "Phurba"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Phurba_MET_DP144211.jpg/500px-Phurba_MET_DP144211.jpg", "polarity": "Hàng phục phẫn nộ", "element": "Thiên thạch, đồng đen hoặc gỗ thiêng", "classification": "Hàng ma, trấn trạch, định ranh giới đàn tràng", "symbolism": {"core_meaning": "Vũ khí định tâm và hàng phục ma chướng tối thượng; ghim chặt và tiêu trừ tận gốc mầm mống tà kiến, độc tố ngã chấp.", "structural_breakdown": [{"part": "Ba mặt Phật phẫn nộ ở đỉnh", "meaning": "Chế ngự tam độc Tham - Sân - Si."}, {"part": "Thân giữa Makara và nút thắt", "meaning": "Khóa chặt chướng ngại không cho trỗi dậy."}, {"part": "Lưỡi chùy 3 cạnh tam giác", "meaning": "Cắt đứt tam giới phiền não."}]}, "ritual_usage": {"holding_hand": "Hai tay xoay chùy hoặc cắm định vị", "mudra": "Kết ấn Phổ Ba, xoay theo chiều kim đồng hồ để gia trì.", "practical_application": "Cắm định vị 4 phương 8 hướng thiết lập kim cương kết giới."}, "associated_deities": ["Vajrakilaya", "Padmasambhava"]},
+      {"id": "kartika", "system": "phap_khi", "name": {"vietnamese": "Dao Cong Kim Cang (Loan Đao)", "sanskrit": "Kartika / Kartrī", "tibetan": "Drigug"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Kartika_Tibetan_MET.jpg/500px-Kartika_Tibetan_MET.jpg", "polarity": "Nữ tính phẫn nộ", "element": "Thép sắc bén, đồng khảm vàng", "classification": "Đoạn trừ vô minh & lột bỏ ngã chấp", "symbolism": {"core_meaning": "Lưỡi dao bán nguyệt móc câu, biểu thị việc lột bỏ lớp da dày vô minh chấp thủ, cắt đứt dây trói luân hồi.", "structural_breakdown": [{"part": "Cán hình nửa chùy", "meaning": "Đoạn trừ an trụ trên kim cương đại bi."}, {"part": "Miệng Makara ngậm lưỡi", "meaning": "Nuốt chửng ảo giác nhị nguyên."}, {"part": "Lưỡi liềm cong", "meaning": "Chém đứt thói quen phân biệt chủ - khách."}]}, "ritual_usage": {"holding_hand": "Tay phải (Right hand)", "mudra": "Cầm lưỡi dao hướng xuống dưới, luôn phối hợp cùng Chén Sọ.", "practical_application": "Dùng trong nghi thức Phẫn Nộ Kim Cang, pháp tu Chöd."}, "associated_deities": ["Vajrayogini", "Palden Lhamo", "Dakini"]},
+      {"id": "kapala", "system": "phap_khi", "name": {"vietnamese": "Bát Sọ Kim Cương (Chén Đầu Lâu)", "sanskrit": "Kapāla", "tibetan": "Thöpa"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Kapala_Tibet_19th_century.jpg/500px-Kapala_Tibet_19th_century.jpg", "polarity": "Chuyển hóa Tánh Không & Đại Lạc", "element": "Xương sọ người giác ngộ viền bạc", "classification": "Chuyển hóa cấu uế thành cam lồ", "symbolism": {"core_meaning": "Vượt thoát khỏi sợ hãi cái chết; biến độc tố phiền não thành cam lồ trường sinh (Amrita).", "structural_breakdown": [{"part": "Đế 3 đầu lâu tam giác", "meaning": "Ba cửa giải thoát (Không, Vô tướng, Vô nguyện)."}, {"part": "Lòng bát sọ rỗng", "meaning": "Bầu trời Tánh Không ôm trọn hỷ lạc."}, {"part": "Nắp đậy đỉnh chùy", "meaning": "Bảo hộ chân lý mật truyền vi diệu."}]}, "ritual_usage": {"holding_hand": "Tay trái (Left hand)", "mudra": "Bưng ngang tim hoặc đan điền, đón nhận dòng cam lồ.", "practical_application": "Đựng nội cúng dường trong các pháp hội quán đảnh Tối thượng thừa."}, "associated_deities": ["Chakrasamvara", "Hevajra", "Ekajati"]},
+      {"id": "khatvanga", "system": "phap_khi", "name": {"vietnamese": "Trượng Kim Cang (Khatvanga)", "sanskrit": "Khaṭvāṅga", "tibetan": "Khatvanga"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Khatvanga_Tibetan_MET.jpg/500px-Khatvanga_Tibetan_MET.jpg", "polarity": "Mật phối tâm linh bí mật", "element": "Gỗ đàn hương bọc đồng chạm bạc mạ vàng", "classification": "Chứng đắc cảnh giới Bất Nhị", "symbolism": {"core_meaning": "Hiện diện thường trực của người bạn đạo tâm linh trí tuệ; hợp nhất Từ bi và Trí tuệ.", "structural_breakdown": [{"part": "Đỉnh chùy 8 cạnh", "meaning": "Trí tuệ cứu cánh viên mãn của chư Phật."}, {"part": "Ba đầu người xếp tầng", "meaning": "Đoạn tận Tam Độc và Ba Cõi."}, {"part": "Bình báu cam lồ", "meaning": "Dòng suối pháp bất tử nuôi dưỡng tuệ mạng."}]}, "ritual_usage": {"holding_hand": "Tựa vào khuỷu tay trái", "mudra": "Gác trượng đứng tựa vai trái, vươn cao đầu trượng.", "practical_application": "Pháp khí tiêu biểu của các Mahasiddha và Guru Rinpoche."}, "associated_deities": ["Padmasambhava", "Yeshe Tsogyal", "Vajrayogini"]},
+      {"id": "pasha", "system": "phap_khi", "name": {"vietnamese": "Dây Thòng Lọng Kim Cang", "sanskrit": "Pāśa", "tibetan": "Zhakpa"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Dorje_symbol.jpg/500px-Dorje_symbol.jpg", "polarity": "Trói buộc ma chướng & Định niệm", "element": "Dây thừng ngũ sắc bện chỉ kim cương", "classification": "Trói buộc ngã chấp và tà ma", "symbolism": {"core_meaning": "Bắt giữ, trói chặt tâm loạn động và câu thúc năng lượng tiêu cực.", "structural_breakdown": [{"part": "Thân dây bện tròn", "meaning": "Chánh niệm kiên cố không kẽ hở."}, {"part": "Vòng thòng lọng", "meaning": "Không gian Tánh Không bao vây không chốn thoát."}, {"part": "Móc chùy hai đầu", "meaning": "Khóa chặt tâm thức trong chánh định."}]}, "ritual_usage": {"holding_hand": "Tay trái (Left hand)", "mudra": "Kết ấn Pāśa Mudra (ngón trỏ và cái bắt vòng).", "practical_application": "Dùng trong các đàn tràng hàng phục, trừ tà và định tâm."}, "associated_deities": ["Avalokiteshvara 1000 Tay", "Acala"]},
+      {"id": "ankusha", "system": "phap_khi", "name": {"vietnamese": "Móc Sắt Kim Cang (Kim Cang Câu)", "sanskrit": "Aṅkuśa", "tibetan": "Chakkyu"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Dorje_symbol.jpg/500px-Dorje_symbol.jpg", "polarity": "Triệu thỉnh & Lôi kéo về bờ giác", "element": "Sắt mạ vàng, cán hình chùy", "classification": "Lôi kéo chúng sinh quay về chánh pháp", "symbolism": {"core_meaning": "Chế ngự tâm hoang dại và lôi kéo mãnh liệt chúng sinh về bờ giác ngộ.", "structural_breakdown": [{"part": "Cán chùy Kim Cang", "meaning": "Hành động dẫn dắt bằng từ bi thiện xảo."}, {"part": "Mũi nhọn thẳng", "meaning": "Đâm thủng vỏ bọc vô minh kiêu mạn."}, {"part": "Lưỡi móc cong ngược", "meaning": "Triệu thỉnh chư Bản tôn, lôi kéo tâm mê muội."}]}, "ritual_usage": {"holding_hand": "Tay phải (Right hand)", "mudra": "Cầm hướng móc lên trên hoặc kéo vào phía trong lòng ngực.", "practical_application": "Nghi thức Triệu Thỉnh năng lượng cát tường, tài lộc."}, "associated_deities": ["Kurukulle", "Jambhala"]},
+      {"id": "khadga", "system": "phap_khi", "name": {"vietnamese": "Thanh Kiếm Trí Tuệ (Bát Nhã Kiếm)", "sanskrit": "Khaḍga", "tibetan": "Raltri"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Kartika_Tibetan_MET.jpg/500px-Kartika_Tibetan_MET.jpg", "polarity": "Trí tuệ sắc bén đoạn diệt vô minh", "element": "Lưỡi thép ánh lửa quang minh", "classification": "Đoạn tuyệt vô minh và sở tri chướng", "symbolism": {"core_meaning": "Thanh gươm bén ngót rực cháy ánh lửa Bát-nhã, chém đứt cùng lúc Sở tri chướng và Phiền não chướng.", "structural_breakdown": [{"part": "Lưỡi gươm rực lửa", "meaning": "Ngọn lửa Trí Tuệ thiêu rụi tà kiến."}, {"part": "Hai lưỡi sắc bén", "meaning": "Liễu ngộ Chân đế và Tục đế."}, {"part": "Cán sen chùy", "meaning": "Khởi sanh từ bồ-đề kim cương thanh tịnh."}]}, "ritual_usage": {"holding_hand": "Tay phải vung cao ngang đầu", "mudra": "Ấn Kiếm Kim Cang (Khadga Mudra).", "practical_application": "Chém đứt nghiệp chướng, khai thị trí tuệ."}, "associated_deities": ["Manjushri", "Acala"]},
+      {"id": "trishula", "system": "phap_khi", "name": {"vietnamese": "Cây Đinh Ba Kim Cang (Tam Xoa Kích)", "sanskrit": "Triśūla", "tibetan": "Tse-sum"}, "category_id": "wrathful", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Khatvanga_Tibetan_MET.jpg/500px-Khatvanga_Tibetan_MET.jpg", "polarity": "Nhiếp phục tam độc & Thông tam mạch", "element": "Thép rèn, đồng mạ vàng bọc ngọn lửa", "classification": "Chinh phục tam giới, đả thông kinh mạch", "symbolism": {"core_meaning": "Ba mũi giáo nhọn vươn thẳng, tiêu trừ Tam Độc và đả thông Ba Kênh Năng Lượng nội thể.", "structural_breakdown": [{"part": "Mũi nhọn trung tâm", "meaning": "Kênh năng lượng trung tâm (Avadhuti)."}, {"part": "Hai mũi nhọn hai bên", "meaning": "Kênh mặt trời (Pingala) và Kênh mặt trăng (Ida)."}, {"part": "Ngọn lửa bọc quanh", "meaning": "Lửa Tumo thiêu rụi hạt giống luân hồi."}]}, "ritual_usage": {"holding_hand": "Tay phải hoặc dựng đứng bên bàn thờ", "mudra": "Dựng kích thẳng đứng trấn phục các phương hướng.", "practical_application": "Trấn áp tà khí phương vị, điều hòa dòng chảy kinh mạch."}, "associated_deities": ["Guru Dragpo", "Mahakala"]},
+      {"id": "damaru", "system": "phap_khi", "name": {"vietnamese": "Trống Lắc Kim Cang (Trống Chöd)", "sanskrit": "Ḍamaru", "tibetan": "Chö-da"}, "category_id": "musical", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tibetan_Damaru.jpg/500px-Tibetan_Damaru.jpg", "polarity": "Âm thanh hợp nhất Cực Tánh", "element": "Gỗ quý hoặc Xương sọ, da thuộc", "classification": "Hiệu triệu Không Hành Nữ & Đánh thức giác tánh", "symbolism": {"core_meaning": "Âm thanh nguyên sơ của vũ trụ (Nada). Tiếng gõ dồn dập hiệu triệu chư Không Hành Nữ và xua tan mộng ngã chấp.", "structural_breakdown": [{"part": "Hai mặt trống chụm eo", "meaning": "Hợp nhất Bất Nhị giữa Hiện tượng và Bản thể."}, {"part": "Hai viên bi lắc gắn dây", "meaning": "Phương tiện và Trí tuệ va chạm tạo nên tiếng pháp."}, {"part": "Dải lụa ngũ sắc rủ dài", "meaning": "Năm luồng ánh sáng đại trí gia trì."}]}, "ritual_usage": {"holding_hand": "Tay phải (Right hand)", "mudra": "Lắc xoay cổ tay linh hoạt để hai viên bi gõ đều đặn.", "practical_application": "Dùng trong nghi thức Chöd, tụng niệm thiền định."}, "associated_deities": ["Machig Labdrön", "Padmasambhava"]},
+      {"id": "kangling", "system": "phap_khi", "name": {"vietnamese": "Tù Và Xương Ống Chân (Kangling)", "sanskrit": "Kangling", "tibetan": "Kangling"}, "category_id": "musical", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Kangling_Tibetan_MET.jpg/500px-Kangling_Tibetan_MET.jpg", "polarity": "Thức tỉnh vô thường sâu sắc", "element": "Xương ống chân người (hoặc hợp kim đúc)", "classification": "Triệu thỉnh chư Hộ Pháp & Tiêu trừ ngã ái", "symbolism": {"core_meaning": "Âm thanh bi tráng chấn động tâm can, thức tỉnh trực diện hành giả về thân phận phù du mong manh.", "structural_breakdown": [{"part": "Đầu thổi nạm bạc", "meaning": "Tâm nguyện thuần khiết từ Bồ Đề tâm."}, {"part": "Ống xương rỗng", "meaning": "Kênh dẫn đối diện dũng cảm với sinh tử."}, {"part": "Miệng loa mắt Makara", "meaning": "Âm thanh xuyên thủng cõi vô hình tam giới."}]}, "ritual_usage": {"holding_hand": "Nâng bằng hai tay hoặc ngậm thổi", "mudra": "Thổi hơi dài sâu từ đan điền theo tiết điệu Chöd.", "practical_application": "Thổi nơi tha ma địa triệu thỉnh phi nhân đến nhận sự bố thí thân mạng."}, "associated_deities": ["Chư Tổ Dòng Pháp Chöd", "Mahakala"]},
+      {"id": "dungchen", "system": "phap_khi", "name": {"vietnamese": "Kèn Đồng Dài Tây Tạng (Dungchen)", "sanskrit": "Kèn Dungchen", "tibetan": "Dungchen"}, "category_id": "musical", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Tibetan_dungchen_horn.jpg/500px-Tibetan_dungchen_horn.jpg", "polarity": "Oai lực chấn động hư không", "element": "Đồng đỏ dát thau mạ vàng", "classification": "Hàng phục ma quân & Cung nghênh chư Phật", "symbolism": {"core_meaning": "Âm vang trầm hùng như tiếng sư tử hống làm chấn động tam giới, xua tan bóng tối u mê của ma chướng.", "structural_breakdown": [{"part": "Các khớp nối trượt thu gọn", "meaning": "Sự quyền biến linh hoạt trong hóa độ."}, {"part": "Họa tiết rồng & Makara", "meaning": "Sự bảo hộ dũng mãnh của Hộ Pháp."}, {"part": "Loa kèn khổng lồ", "meaning": "Pháp âm lan tỏa vô tận mười phương."}]}, "ritual_usage": {"holding_hand": "Nhạc công hai tay giữ ống thổi", "mudra": "Lấy hơi tuần hoàn duy trì âm thanh trầm liên tục.", "practical_application": "Thổi từ nóc tu viện đón bình minh hoặc mở đầu đại lễ quán đảnh."}, "associated_deities": ["Chư Vị Hộ Pháp (Dharmapalas)"]},
+      {"id": "shankha", "system": "phap_khi", "name": {"vietnamese": "Bạch Hải Loa (Ốc Biển Màu Trắng)", "sanskrit": "Śaṅkha", "tibetan": "Dungkar"}, "category_id": "musical", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Tibetan_conch_shell_trumpet.jpg/500px-Tibetan_conch_shell_trumpet.jpg", "polarity": "Tịch tĩnh cát tường viên mãn", "element": "Vỏ ốc biển trắng tự nhiên xoay phải", "classification": "Cát tường & Tuyên thuyết chánh pháp", "symbolism": {"core_meaning": "Một trong Bát Cát Tường. Tượng trưng cho tiếng nói vi diệu của Đức Phật vang dội khắp muôn phương, thức tỉnh muôn loài.", "structural_breakdown": [{"part": "Đường xoắn hữu triền", "meaning": "Vận hành thuận chiều vũ trụ và công đức hy hữu."}, {"part": "Thân bọc bạc chạm Bát Cát Tường", "meaning": "Tướng hảo quang minh trang nghiêm."}, {"part": "Miệng ngậm hình đóa sen", "meaning": "Lời dạy thanh tịnh không nhiễm bụi trần."}]}, "ritual_usage": {"holding_hand": "Nâng bằng hai tay với sự cung kính", "mudra": "Thổi ba hồi ngân vang trầm ấm.", "practical_application": "Triệu thỉnh tăng đoàn vân tập, thanh tẩy đạo tràng cúng dường diệu âm."}, "associated_deities": ["Thích Ca Mâu Ni Phật", "Bát Đại Bồ Tát"]},
+      {"id": "tingsha", "system": "phap_khi", "name": {"vietnamese": "Chuông Gió Mật Tông (Tingsha)", "sanskrit": "Tingsha", "tibetan": "Tingsha"}, "category_id": "musical", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Tibetan_cymbals_rolmo.jpg/500px-Tibetan_cymbals_rolmo.jpg", "polarity": "Thanh lọc không gian & Định tâm", "element": "Đồng nguyên chất đúc dày nối nhau bằng dây da", "classification": "Thanh lọc tạp niệm & Thí thực ngạ quỷ", "symbolism": {"core_meaning": "Thanh âm trong trẻo ngân dài, có khả năng xuyên thấu cõi giới vô hình, xoa dịu nỗi đau khổ đói khát của loài ngạ quỷ.", "structural_breakdown": [{"part": "Hai đĩa chuông đối xứng", "meaning": "Sự cân bằng hoàn hảo giữa Thân và Tâm."}, {"part": "Họa tiết chú Lục Tự", "meaning": "Khắc ghi chân ngôn cứu khổ."}, {"part": "Sợi dây da nối tâm", "meaning": "Dòng ý thức nối kết hiện tại với tánh Không."}]}, "ritual_usage": {"holding_hand": "Hai tay cầm dây da gõ nhẹ hai mép đĩa", "mudra": "Gõ 3 tiếng thanh khiết trước khi tọa thiền.", "practical_application": "Thanh lọc không gian phòng thiền, hồi hướng trong lễ khói hương Sur."}, "associated_deities": ["Avalokiteshvara", "Hương Linh & Ngạ Quỷ"]},
+      {"id": "bumpa", "system": "phap_khi", "name": {"vietnamese": "Bình Quán Đảnh (Bình Bumba)", "sanskrit": "Kalaśa", "tibetan": "Bumpa"}, "category_id": "offering", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Ritual_Vase_%28Bumpa%29_LACMA.jpg/500px-Ritual_Vase_%28Bumpa%29_LACMA.jpg", "polarity": "Tẩy tịnh và gia hộ", "element": "Đồng chạm bạc dát vàng, cắm lông công", "classification": "Quán đảnh & Tẩy trừ uế trược", "symbolism": {"core_meaning": "Cung điện thanh tịnh của Bổn Tôn, chứa nguồn nước cam lồ gia trì gột rửa nghiệp chướng từ vô lượng kiếp.", "structural_breakdown": [{"part": "Bụng bình tròn viên mãn", "meaning": "Kho tàng công đức vô tận của Phật giới."}, {"part": "Cổ bình vươn cao", "meaning": "Tinh tấn giải thoát hướng thượng."}, {"part": "Cành lông công và cỏ Kusa", "meaning": "Năng lực giải độc; chuyển hóa phiền não thành trí giác."}]}, "ritual_usage": {"holding_hand": "Nâng hai tay hoặc tay phải cầm rảy nước", "mudra": "Ấn sái tịnh, rảy giọt cam lồ lên đảnh đầu người thọ pháp.", "practical_application": "Dùng trong lễ Quán đảnh Bình Trụ (Vase Empowerment)."}, "associated_deities": ["Amitayus", "Ushnisha Vijaya"]},
+      {"id": "mandala_plate", "system": "phap_khi", "name": {"vietnamese": "Đĩa Cúng Dường Mạn-đà-la", "sanskrit": "Maṇḍala-arghya", "tibetan": "Mandrel"}, "category_id": "offering", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Tibetan_mandala_offering_set.jpg/500px-Tibetan_mandala_offering_set.jpg", "polarity": "Tích lũy Phước đức và Trí tuệ", "element": "Vàng, bạc, đồng thau chạm trổ, gạo nghệ", "classification": "Đại cúng dường toàn thể vũ trụ", "symbolism": {"core_meaning": "Biểu trưng cho toàn thể vũ trụ gồm Núi Tu Di, 4 đại châu, mặt trời, mặt trăng dâng lên cúng dường mười phương chư Phật.", "structural_breakdown": [{"part": "Mâm đế phẳng tròn", "meaning": "Nền tảng kim cương kiên cố của vũ trụ."}, {"part": "Ba tầng vành tròn đồng tâm", "meaning": "Ba cõi thế gian lần lượt được thanh lọc dâng cúng."}, {"part": "Đỉnh nạm ngọc Mani", "meaning": "Tột đỉnh Tu Di sơn, nơi an trụ chư Phật."}]}, "ritual_usage": {"holding_hand": "Tay trái nâng đế mâm, tay phải lau mặt đĩa", "mudra": "Xoay cổ tay lau đĩa 3 vòng tịnh hóa Thân - Khẩu - Ý.", "practical_application": "Thực hành 100.000 biến cúng dường Mạn-đà-la trong pháp tu Ngöndro."}, "associated_deities": ["Samantabhadra", "Chư Phật Mười Phương"]},
+      {"id": "torma", "system": "phap_khi", "name": {"vietnamese": "Bánh Cúng Dường Torma", "sanskrit": "Baling / Torma", "tibetan": "Torma"}, "category_id": "offering", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Ritual_Vase_%28Bumpa%29_LACMA.jpg/500px-Ritual_Vase_%28Bumpa%29_LACMA.jpg", "polarity": "Bố thí vô úy & Cúng dường Bổn tôn", "element": "Bột lúa mạch Tsampa, bơ yak và phẩm màu", "classification": "Hóa hiện thân tướng Bổn Tôn và cam lồ", "symbolism": {"core_meaning": "Tác phẩm điêu khắc tâm linh tượng trưng cho thân tướng của chư Phật, Bồ Tát, Hộ Pháp, hoặc nguồn cam lồ nuôi dưỡng chúng sinh.", "structural_breakdown": [{"part": "Thân bánh hình chóp tam giác", "meaning": "Cung điện hoặc thân tướng trí tuệ của Bổn Tôn."}, {"part": "Hoa văn bơ ngũ sắc", "meaning": "Trang sức trang nghiêm và quang minh gia hộ."}, {"part": "Đỉnh gắn biểu tượng Nhật Nguyệt", "meaning": "Sự hợp nhất Phương tiện và Trí tuệ."}]}, "ritual_usage": {"holding_hand": "Đặt trang nghiêm trên bàn thờ hoặc dâng rải", "mudra": "Tụng thần chú biến thực gia trì Torma thành cam lồ vô tận.", "practical_application": "Cúng dường hằng ngày tại tu viện, dâng cúng Hộ Pháp."}, "associated_deities": ["Yidam", "Dharmapala"]},
+      {"id": "mala", "system": "phap_khi", "name": {"vietnamese": "Tràng Hạt Kim Cương (Thengwa)", "sanskrit": "Mālā", "tibetan": "Thengwa"}, "category_id": "protection", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Bodhi_seeds_mala.jpg/500px-Bodhi_seeds_mala.jpg", "polarity": "Nhiếp tâm định niệm", "element": "Hạt bồ đề, gỗ đàn hương, san hô đỏ, xương hoặc đá Dzi", "classification": "Tu trì 4 sự nghiệp (Tức, Tăng, Hoài, Tru)", "symbolism": {"core_meaning": "108 hạt biểu trưng cho chuyển hóa 108 phiền não thành 108 tam-muội trí tuệ. Sợi dây xuyên chuỗi hạt là Pháp thân bất biến.", "structural_breakdown": [{"part": "Hạt Chủ (Guru Bead)", "meaning": "Trí tuệ của Bậc Đạo sư và Quả vị Phật cứu cánh."}, {"part": "Sợi chỉ xuyên tâm", "meaning": "Tam thân Phật hoặc chín cỗ xe giáo pháp."}, {"part": "Cặp thẻ đếm gắn linh & chùy", "meaning": "Phương tiện và Trí tuệ kiểm đếm số vạn câu chú."}]}, "ritual_usage": {"holding_hand": "Tay trái ngang ngực", "mudra": "Dùng ngón cái lần hạt vào lòng theo phương vị sự nghiệp.", "practical_application": "Định tâm trì tụng thần chú Bổn Tôn trong các khóa ẩn tu."}, "associated_deities": ["Avalokiteshvara", "Toàn thể chư Tôn Mật Tạng"]},
+      {"id": "mani_wheel", "system": "phap_khi", "name": {"vietnamese": "Kinh Luân (Bánh Xe Cầu Nguyện)", "sanskrit": "Mani-cakra", "tibetan": "Khorlo"}, "category_id": "protection", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Tibetan_Prayer_Wheel.jpg/500px-Tibetan_Prayer_Wheel.jpg", "polarity": "Tỏa chiếu Đại Bi vô lượng", "element": "Đồng đỏ, bạc, bên trong cuộn hàng triệu câu thần chú", "classification": "Tích lũy công đức & Tiêu trừ chướng nghiệp", "symbolism": {"core_meaning": "Mô phỏng Chuyển Pháp Luân. Mỗi vòng quay phóng thích hàng triệu dòng quang minh chân ngôn phổ độ khắp 6 cõi luân hồi.", "structural_breakdown": [{"part": "Trục quay bằng sắt", "meaning": "Trục năng lượng vũ trụ bất động."}, {"part": "Thân trụ khắc chú Lục Tự", "meaning": "Nguyện lực tầm thanh cứu khổ của Bồ Tát Quán Âm."}, {"part": "Quả nặng đối trọng", "meaning": "Lực quán tính quay đều, biểu trưng Tinh Tấn Ba La Mật."}]}, "ritual_usage": {"holding_hand": "Tay phải (Right hand)", "mudra": "Cầm cán quay êm ái theo chiều kim đồng hồ.", "practical_application": "Vừa quay vừa trì niệm chân ngôn 'Om Mani Padme Hum'."}, "associated_deities": ["Quán Thế Âm Lục Tự"]},
+      {"id": "lungta", "system": "phap_khi", "name": {"vietnamese": "Cờ Cầu Nguyện Phong Mã (Lungta)", "sanskrit": "Prāṇa-dhvaja", "tibetan": "Lungta"}, "category_id": "protection", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Prayer_flags_Nepal.jpg/500px-Prayer_flags_Nepal.jpg", "polarity": "Lan tỏa năng lượng thanh tịnh", "element": "Vải ngũ sắc (Xanh dương, Trắng, Đỏ, Xanh lá, Vàng)", "classification": "Tăng trưởng vận may, tiêu trừ tai ương", "symbolism": {"core_meaning": "Ngựa Gió (Phong Mã) chở bảo châu Như Ý phi nhanh qua không gian, mang theo lời cầu nguyện gia hộ muôn loài mỗi khi gió thổi qua.", "structural_breakdown": [{"part": "Năm màu vải tương ứng Ngũ Đại", "meaning": "Không gian, Gió, Lửa, Nước, Đất."}, {"part": "Ngựa Gió ở trung tâm", "meaning": "Khí lực (Prana) thanh tịnh vượt qua chướng ngại."}, {"part": "4 linh thú 4 góc", "meaning": "Tự tin (Sư tử), Tỉnh giác (Hổ), Dũng mãnh (Rồng), Trí tuệ (Garuda)."}]}, "ritual_usage": {"holding_hand": "Treo căng trên không trung", "mudra": "Giữ tâm thanh tịnh trì chú khi treo cờ ở nơi cao ráo.", "practical_application": "Treo trên đèo cao, nóc nhà, cầu treo hoặc tu viện."}, "associated_deities": ["Green Tara", "Garuda"]},
+      {"id": "melong", "system": "phap_khi", "name": {"vietnamese": "Gương Đồng Mật Tông (Melong)", "sanskrit": "Ādarśa", "tibetan": "Melong"}, "category_id": "protection", "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Ritual_Vase_%28Bumpa%29_LACMA.jpg/500px-Ritual_Vase_%28Bumpa%29_LACMA.jpg", "polarity": "Phản chiếu Chân Như & Tánh Không", "element": "Đồng trắng hoặc hợp kim 5 kim loại đánh bóng", "classification": "Chiêm bốc Mật tông (Mo) & Đại Viên Cảnh Trí", "symbolism": {"core_meaning": "Tượng trưng cho tâm thức sáng suốt, phản chiếu vạn vật mà không bị nhiễm ô hay lưu giữ bất kỳ dấu vết nào.", "structural_breakdown": [{"part": "Mặt gương nhẵn bóng", "meaning": "Tánh Không thanh tịnh vô nhiễm của tâm nguyên thủy."}, {"part": "Vành khắc chú hoặc chữ HRIH", "meaning": "Năng lượng đại bi bảo hộ tâm thức."}, {"part": "Khung đính vải ngũ sắc", "meaning": "Sự viên mãn của hiện tượng giới."}]}, "ritual_usage": {"holding_hand": "Cầm tay hoặc đeo trước ngực đạo sư", "mudra": "Hướng gương soi chiếu vào đàn tràng hoặc người thọ pháp.", "practical_application": "Dùng trong lễ Điểm Đạo Dzogchen, chiêm bốc tiên tri (Mo)."}, "associated_deities": ["Vajrasattva", "Garab Dorje", "Palden Lhamo"]},
+
+      // --- TÔN TƯỢNG BỔN TÔN (bo_ton/) ---
+      {"id": "deity_vajradhara", "system": "deity", "name": {"vietnamese": "Đức Kim Cang Trì (Bản Sơ Phật)", "sanskrit": "Vajradhara", "tibetan": "Dorje Chang"}, "category_id": "buddha_adibuddha", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Vajradhara", "polarity": "Hợp nhất Bất Nhị", "element": "Pháp thân quang minh (Lam ngọc)", "classification": "Bản Sơ Phật / Cội nguồn truyền thừa Tân Dịch", "symbolism": {"core_meaning": "Hiện thân tối cao của Pháp thân và Báo thân viên mãn, là cội nguồn của toàn bộ Mạn-đà-la và dòng truyền thừa Mật thừa.", "structural_breakdown": [{"part": "Sắc thân xanh lam đậm", "meaning": "Bản tánh Tánh Không bất biến."}, {"part": "Hai tay bắt chéo trước ngực", "meaning": "Sự dung hợp tuyệt đối giữa Từ Bi và Trí Tuệ."}, {"part": "Chùy và Chuông Kim Cang trên tay", "meaning": "Phương tiện thiện xảo và Trí tuệ Tánh Không viên mãn."}]}, "ritual_usage": {"holding_hand": "Cầm chùy (phải) và chuông (trái) bắt chéo ngang ngực", "mudra": "Vajrahumkara Mudra", "practical_application": "Quán tưởng gốc rễ Đạo sư trong thời khóa Guru Yoga và quán đảnh."}, "associated_deities": ["Tilopa", "Naropa", "Marpa", "Milarepa"]},
+      {"id": "deity_samantabhadra", "system": "deity", "name": {"vietnamese": "Đức Phổ Hiền Như Lai (Pháp Thân Phật)", "sanskrit": "Samantabhadra", "tibetan": "Kuntuzangpo"}, "category_id": "buddha_adibuddha", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Samantabhadra", "polarity": "Bản lai thanh tịnh", "element": "Hư không vô vi tuyệt đối", "classification": "Bản Sơ Phật trường phái Cổ Mật (Nyingma)", "symbolism": {"core_meaning": "Bản tánh giác ngộ nguyên thủy vốn thanh tịnh từ vô thủy, chưa từng bị mê lầm chi phối.", "structural_breakdown": [{"part": "Thân sắc xanh lam thẫm, không y phục", "meaning": "Tánh Không trần trụi vượt khỏi mọi ý niệm quy ước."}, {"part": "Tư thế kiết già bất động", "meaning": "Tự nhiên an trụ trong bản tánh chân như."}, {"part": "Hợp nhất cùng Phật Mẫu Samantabhadrī", "meaning": "Bản thể tính (Không) và Hiện tượng tính (Sắc) viên dung."}]}, "ritual_usage": {"holding_hand": "Hai tay kết ấn Thiền Định đặt trên đùi", "mudra": "Dhyana Mudra", "practical_application": "Trọng tâm quán chiếu cứu cánh trong giáo pháp Đại Viên Mãn."}, "associated_deities": ["Garab Dorje", "Padmasambhava", "Longchenpa"]},
+      {"id": "deity_vairocana", "system": "deity", "name": {"vietnamese": "Đức Đại Nhật Như Lai (Tỳ Lô Giá Na)", "sanskrit": "Vairocana", "tibetan": "Nampar Nangdze"}, "category_id": "buddha_dhyani", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Vairocana", "polarity": "Dương tính / Tâm điểm vũ trụ", "element": "Hư không giới (Sắc trắng)", "classification": "Trung tâm Ngũ Trí Như Lai / Chuyển hóa Si độc", "symbolism": {"core_meaning": "Mặt trời trí tuệ chiếu soi khắp pháp giới; chuyển hóa vô minh si ám thành Pháp Giới Thể Tánh Trí.", "structural_breakdown": [{"part": "Sắc thân trắng muốt", "meaning": "Sự thanh tịnh tuyệt đối của Pháp giới."}, {"part": "Thủ ấn Chuyển Pháp Luân", "meaning": "Bánh xe chánh pháp không ngừng khai mở trí tuệ."}, {"part": "Tòa tám sư tử tuyết", "meaning": "Oai đức dũng mãnh đập tan sợ hãi và tà kiến."}]}, "ritual_usage": {"holding_hand": "Hai tay đặt trước ngực bắt ấn", "mudra": "Dharmachakra Mudra", "practical_application": "Trụ xứ trung tâm trong đàn tràng Kim Cương Giới và Thai Tạng Giới."}, "associated_deities": ["Ngũ Trí Như Lai", "Kim Cương Giới"]},
+      {"id": "deity_akshobhya", "system": "deity", "name": {"vietnamese": "Đức Bất Động Phật (A Súc Bệ)", "sanskrit": "Akṣobhya", "tibetan": "Mikyo Pa"}, "category_id": "buddha_dhyani", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Akshobhya", "polarity": "Bất động kiên cố", "element": "Thủy đại (Phương Đông sắc lam)", "classification": "Ngũ Trí Như Lai / Chuyển hóa Sân độc", "symbolism": {"core_meaning": "Tâm trí kiên định như gương sáng; chuyển hóa cơn giận dữ thành Đại Viên Cảnh Trí trong suốt vô ngại.", "structural_breakdown": [{"part": "Sắc thân xanh dương đậm", "meaning": "Độ lắng sâu và tĩnh lặng của nước."}, {"part": "Ấn Xúc Địa (Bhumisparsha)", "meaning": "Mặt đất làm chứng cho sự kiên định đập tan ma quân."}, {"part": "Chùy Kim Cang dựng đứng tay trái", "meaning": "Bản tánh kim cương bất hoại trước sóng gió phiền não."}]}, "ritual_usage": {"holding_hand": "Tay phải rủ chạm đất, tay trái giữ chùy", "mudra": "Bhumisparsha Mudra", "practical_application": "Trấn giữ phương Đông Mạn-đà-la; hóa giải nghiệp sân hận."}, "associated_deities": ["Vajrapani", "Vajrasattva"]},
+      {"id": "deity_ratnasambhava", "system": "deity", "name": {"vietnamese": "Đức Bảo Sinh Phật", "sanskrit": "Ratnasambhava", "tibetan": "Rinchen Jungne"}, "category_id": "buddha_dhyani", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Ratnasambhava", "polarity": "Ban phát vô tận", "element": "Địa đại (Phương Nam sắc vàng kim)", "classification": "Ngũ Trí Như Lai / Chuyển hóa Kiêu mạn", "symbolism": {"core_meaning": "Kho báu công đức sinh vạn thiện hạnh; chuyển hóa ngã mạn tự cao thành Bình Đẳng Tánh Trí coi muôn loài như một.", "structural_breakdown": [{"part": "Sắc thân vàng kim", "meaning": "Sự trù phú ấm áp của đất mẹ."}, {"part": "Thủ ấn Thí Nguyện", "meaning": "Bố thí vô lượng, đáp ứng sở nguyện chánh pháp."}, {"part": "Bảo châu Như Ý", "meaning": "Nguồn phước đức xua tan bần hàn tâm linh."}]}, "ritual_usage": {"holding_hand": "Tay phải ngửa lòng hướng xuống, tay trái cầm bảo châu", "mudra": "Varada Mudra", "practical_application": "Trấn giữ phương Nam Mạn-đà-la; nghi lễ cầu tăng trưởng phước đức, thọ mạng."}, "associated_deities": ["Jambhala", "Vasudhara"]},
+      {"id": "deity_amitabha", "system": "deity", "name": {"vietnamese": "Đức Phật A Di Đà (Vô Lượng Quang)", "sanskrit": "Amitābha", "tibetan": "Opame"}, "category_id": "buddha_dhyani", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Amitabha", "polarity": "Từ bi tiếp dẫn", "element": "Hỏa đại (Phương Tây sắc đỏ)", "classification": "Ngũ Trí Như Lai / Chuyển hóa Tham ái", "symbolism": {"core_meaning": "Ánh sáng vô biên soi tỏ thực tại; chuyển hóa tham luyến ái dục thành Diệu Quan Sát Trí thấu rõ từng chi tiết của vạn pháp.", "structural_breakdown": [{"part": "Sắc thân đỏ hồng ngọc", "meaning": "Ngọn lửa từ bi thiêu đốt tạp nhiễm, sưởi ấm tâm hồn."}, {"part": "Thủ ấn Thiền Định", "meaning": "Tâm tịch tĩnh an trụ cảnh giới Cực Lạc thuần khiết."}, {"part": "Bát khất thực chứa cam lồ", "meaning": "Thu nhận khổ đau và trao lại dòng pháp bất tử."}]}, "ritual_usage": {"holding_hand": "Hai tay đan chéo ngửa lòng đặt ngang đan điền", "mudra": "Dhyana Mudra", "practical_application": "Trấn giữ phương Tây; pháp môn chuyển di tâm thức Phowa."}, "associated_deities": ["Avalokiteshvara", "Amitayus"]},
+      {"id": "deity_amoghasiddhi", "system": "deity", "name": {"vietnamese": "Đức Bất Không Thành Tựu Phật", "sanskrit": "Amoghasiddhi", "tibetan": "Donyo Drupa"}, "category_id": "buddha_dhyani", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Amoghasiddhi", "polarity": "Hành động dứt khoát", "element": "Phong đại (Phương Bắc sắc lục)", "classification": "Ngũ Trí Như Lai / Chuyển hóa Đố kỵ", "symbolism": {"core_meaning": "Sự nghiệp thành tựu vô ngại; chuyển hóa ganh ghét đố kỵ thành Thành Sở Tác Trí làm lợi ích cho muôn loài.", "structural_breakdown": [{"part": "Sắc thân xanh lá lục bảo", "meaning": "Sinh khí của gió, sức sống luân lưu không ngừng."}, {"part": "Thủ ấn Vô Úy", "meaning": "Ban tặng bình an, bảo vệ chúng sinh khỏi sợ hãi."}, {"part": "Chùy Thập Tự (Vishvavajra)", "meaning": "Nền tảng hành động kim cương đa phương vô ngại."}]}, "ritual_usage": {"holding_hand": "Tay phải giơ ngang ngực ra trước, tay trái giữ chùy thập tự", "mudra": "Abhaya Mudra", "practical_application": "Trấn giữ phương Bắc Mạn-đà-la; tiêu trừ sợ hãi và viên mãn đại sự nghiệp."}, "associated_deities": ["Green Tara", "Vishvavajra"]},
+      {"id": "deity_vajrasattva", "system": "deity", "name": {"vietnamese": "Đức Kim Cang Tát Đỏa (Vajrasattva)", "sanskrit": "Vajrasattva", "tibetan": "Dorje Sempa"}, "category_id": "buddha_purification", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Vajrasattva", "polarity": "Tịnh hóa Thân - Khẩu - Ý", "element": "Nguyệt quang thanh khiết (Bạch ngọc)", "classification": "Bổn Tôn sám hối và tịnh hóa nghiệp chướng", "symbolism": {"core_meaning": "Tổng trì Ngũ Trí Như Lai; chủ trì việc sám hối và rửa sạch mọi giới nguyện bị suy suyển cùng nghiệp chướng vô minh.", "structural_breakdown": [{"part": "Sắc thân trắng như tuyết", "meaning": "Tâm bồ-đề thanh tịnh không bao giờ bị ô nhiễm."}, {"part": "Chùy Kim Cang dựng đứng ngực phải", "meaning": "Sự kiên định không lay chuyển của tâm đại bi."}, {"part": "Chuông Kim Cang đặt nơi hông trái", "meaning": "Trí tuệ Bát-nhã Tánh Không ôm trọn vạn hữu."}]}, "ritual_usage": {"holding_hand": "Cầm chùy (ngực) và chuông (hông)", "mudra": "Vajrasattva Mudra", "practical_application": "Trì tụng Thần Chú 100 Chữ trong 4 pháp tiên hành Ngöndro."}, "associated_deities": ["Ngũ Trí Như Lai", "Vajradhara"]},
+      {"id": "deity_bhaisajyaguru", "system": "deity", "name": {"vietnamese": "Đức Dược Sư Lưu Ly Quang Vương Phật", "sanskrit": "Bhaiṣajyaguru", "tibetan": "Sangye Menla"}, "category_id": "buddha_healing", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Bhaisajyaguru", "polarity": "Trì bệnh & Cứu khổ thân tâm", "element": "Lưu ly lam quang thanh tịnh", "classification": "Giáo Chủ Cõi Tịnh Lưu Ly Phương Đông", "symbolism": {"core_meaning": "Xua tan mọi tật bệnh thân xác, tịnh hóa độc tố tâm linh Tham - Sân - Si và kéo dài thọ mạng cho hành giả.", "structural_breakdown": [{"part": "Thân sắc xanh lưu ly", "meaning": "Ánh sáng chữa lành xuyên thấu không gian tối tăm."}, {"part": "Tay phải cầm cành Myrobalan", "meaning": "Thần dược tối thượng chữa bách bệnh thế gian."}, {"part": "Tay trái nâng bát thuốc cam lồ", "meaning": "Pháp nhũ tịnh hóa gốc rễ tam độc sinh tử."}]}, "ritual_usage": {"holding_hand": "Tay phải cầm cành thảo dược trên gối, tay trái nâng bát", "mudra": "Varada Mudra", "practical_application": "Trì tụng Dược Sư Quán Đảnh Chân Ngôn hồi hướng an lành."}, "associated_deities": ["Thất Phật Dược Sư", "Bát Đại Bồ Tát"]},
+      {"id": "deity_chenrezig", "system": "deity", "name": {"vietnamese": "Đức Quán Thế Âm Tứ Thủ (Chenrezig)", "sanskrit": "Avalokiteśvara", "tibetan": "Chenrezig"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Chenrezig", "polarity": "Đại Bi vô lượng", "element": "Bạch quang cam lồ", "classification": "Đại Bi Bổn Tôn / Hộ mạng xứ Tuyết Tây Tạng", "symbolism": {"core_meaning": "Lòng từ bi vô tận của mười phương chư Phật; lắng nghe và cứu vớt nỗi khổ của lục đạo chúng sinh.", "structural_breakdown": [{"part": "Hai tay chắp ngực ôm ngọc Mani", "meaning": "Tâm Bồ Đề bảo châu thắp sáng niềm tin giác ngộ."}, {"part": "Tay phải trên cầm chuỗi tràng pha lê", "meaning": "Sự tiếp nối không gián đoạn trong việc cứu độ."}, {"part": "Tay trái trên nâng đóa sen trắng", "meaning": "Cư ngụ nơi luân hồi nhưng không vướng bụi trần."}, {"part": "Tấm da linh dương vắt ngang vai", "meaning": "Tâm nhu nhược, hiền hòa và nhẫn nại tối thượng."}]}, "ritual_usage": {"holding_hand": "Chắp tay ôm ngọc Mani, hai tay phụ nâng tràng hạt và hoa sen", "mudra": "Anjali Mudra", "practical_application": "Trì niệm lục tự đại minh 'Om Mani Padme Hum' giải thoát 6 cõi luân hồi."}, "associated_deities": ["Amitabha", "Green Tara"]},
+      {"id": "deity_avalokiteshvara_1000", "system": "deity", "name": {"vietnamese": "Đức Quán Thế Âm Thập Nhất Diện Thiên Thủ", "sanskrit": "Ekādaśamukha Avalokiteśvara", "tibetan": "Chenrezig Chagtong Chentong"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=1000-Armed+Avalokiteshvara", "polarity": "Đại Từ Đại Bi toàn năng", "element": "Bạch kim quang minh", "classification": "Đại Thần Lực Cứu Nạn Lục Đạo", "symbolism": {"core_meaning": "Nghìn mắt nhìn thấu khắp tam giới, nghìn tay ứng hiện cứu độ cùng lúc mọi nỗi thống khổ của muôn loài.", "structural_breakdown": [{"part": "11 gương mặt tầng bậc", "meaning": "10 tầng Bồ Tát hạnh và đỉnh cao là Pháp thân Phật A Di Đà."}, {"part": "1000 cánh tay tạo vòng tròn hào quang", "meaning": "Phương tiện thiện xảo tròn đầy che chở muôn cõi."}, {"part": "Mỗi lòng bàn tay có một con mắt trí tuệ", "meaning": "Hành động từ bi luôn đi kèm sự thấu suốt trí giác."}]}, "ritual_usage": {"holding_hand": "Tám tay chính cầm pháp bảo, các tay phụ xòe như nan hoa", "mudra": "Anjali Mudra & Thủ ấn đa phương", "practical_application": "Hành trì pháp môn trai giới Nyungne tịnh hóa ác nghiệp sâu dày."}, "associated_deities": ["Amitabha", "Hayagriva"]},
+      {"id": "deity_manjushri", "system": "deity", "name": {"vietnamese": "Đức Văn Thù Sư Lợi Bồ Tát (Đại Trí)", "sanskrit": "Mañjuśrī", "tibetan": "Jampelyang"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Manjushri", "polarity": "Trí tuệ sắc bén", "element": "Hỏa quang trí tuệ (Vàng cam)", "classification": "Đại Trí Bổn Tôn / Thầy của chư Phật", "symbolism": {"core_meaning": "Hiện thân trí tuệ thấu triệt chân lý tối hậu; chém đứt mọi lưới nghi và gốc rễ vô minh tích tụ từ vô lượng kiếp.", "structural_breakdown": [{"part": "Thanh kiếm Bát-nhã rực lửa giương cao", "meaning": "Đoạn tuyệt vô minh, thiêu rụi tà kiến sở tri chướng."}, {"part": "Đóa sen xanh nâng kinh Bát Nhã Ba La Mật", "meaning": "Trí tuệ thanh tịnh tối cao vượt lên ngôn từ."}, {"part": "Tướng mạo đồng tử 16 tuổi", "meaning": "Trí tuệ chân thật luôn tươi mới, không bị thời gian chi phối."}]}, "ritual_usage": {"holding_hand": "Tay phải vung gươm ngang đầu, tay trái cầm cành sen nâng sách", "mudra": "Khadga Mudra", "practical_application": "Trì tụng chú 'Om A Ra Pa Tsa Na Dhih' để khai mở trí tuệ."}, "associated_deities": ["Saraswati", "Yamantaka"]},
+      {"id": "deity_vajrapani", "system": "deity", "name": {"vietnamese": "Đức Kim Cang Thủ Bồ Tát (Đại Lực)", "sanskrit": "Vajrapāṇi", "tibetan": "Chana Dorje"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Vajrapani", "polarity": "Phẫn nộ dũng mãnh", "element": "Lôi điện & Hỏa diệm (Sắc chàm)", "classification": "Bí Mật Chủ / Hiện thân oai lực của chư Phật", "symbolism": {"core_meaning": "Hiện thân sức mạnh vô biên của chư Phật để đập tan mọi thế lực ma chướng cản trở bước đường tu học giác ngộ.", "structural_breakdown": [{"part": "Thân tướng phẫn nộ dẫm lên độc xà", "meaning": "Năng lượng chuyển hóa cực mạnh không thể khuất phục."}, {"part": "Tay phải giơ cao chày Kim Cang rực lửa", "meaning": "Sẵn sàng giáng đòn sấm sét tiêu diệt nội ma và ngoại ma."}, {"part": "Vòng lửa bốc cháy cuồn cuộn", "meaning": "Lửa tam-muội thiêu rụi toàn bộ chướng nạn."}]}, "ritual_usage": {"holding_hand": "Tay phải vung chùy lên không trung, tay trái kết ấn phẫn nộ", "mudra": "Karana Mudra", "practical_application": "Trừ tà trục quỷ, hóa giải các bệnh nan y do âm tà quấy nhiễu."}, "associated_deities": ["Garuda", "Hayagriva"]},
+      {"id": "deity_ksitigarbha", "system": "deity", "name": {"vietnamese": "Đức Địa Tạng Vương Bồ Tát", "sanskrit": "Kṣitigarbha", "tibetan": "Sa'i Nyingpo"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Ksitigarbha", "polarity": "Đại Nguyện kiên cố", "element": "Hoàng thổ đại địa sung túc", "classification": "Giáo Chủ U Minh / Bát Đại Bồ Tát", "symbolism": {"core_meaning": "Nguyện lực vững chắc như đất dày dung chứa muôn vật, thề cứu độ sạch sẽ tội nhân trong địa ngục mới thành Phật quả.", "structural_breakdown": [{"part": "Bảo châu Như Ý trên tay", "meaning": "Chiếu rọi ánh sáng xua tan bóng tối địa ngục."}, {"part": "Tích trượng Kim Cang 6 vòng", "meaning": "Rung mở các cửa ngục và đánh thức lương tri chúng sinh 6 cõi."}, {"part": "Vương miện Ngũ Phật tôn nghiêm", "meaning": "Đầy đủ đức hạnh và trí tuệ vô biên của chư Như Lai."}]}, "ritual_usage": {"holding_hand": "Tay phải cầm tích trượng, tay trái nâng bảo châu", "mudra": "Thiền định & Trì tích trượng", "practical_application": "Hành trì hồi hướng siêu độ tổ tiên, hương linh và giải trừ ác mộng nghiệp chướng."}, "associated_deities": ["Yama", "Thập Điện Diêm Vương"]},
+      {"id": "deity_maitreya", "system": "deity", "name": {"vietnamese": "Đức Di Lặc Bồ Tát (Từ Thị Tôn)", "sanskrit": "Maitreya", "tibetan": "Jampa"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Maitreya", "polarity": "Từ Bi hoan hỷ vô lượng", "element": "Hoàng kim quang minh tươi sáng", "classification": "Vị Phật Tương Lai của Hiền Kiếp", "symbolism": {"core_meaning": "Hiện thân cho tình thương thuần khiết không điều kiện, mang lại kỷ nguyên hòa bình, hỷ lạc và thịnh vượng tâm linh mai sau.", "structural_breakdown": [{"part": "Ngồi buông chân theo kiểu Tây phương", "meaning": "Tư thế sẵn sàng đứng dậy bước xuống cõi trần cứu độ."}, {"part": "Ấn Chuyển Pháp Luân nơi ngực", "meaning": "Báo hiệu thời kỳ bánh xe chánh pháp lại được quay rạng rỡ."}, {"part": "Bình nước Cam Lồ & Bánh xe trên sen vai", "meaning": "Tưới mát tâm hồn khô hạn và giáo hóa vô tận."}]}, "ritual_usage": {"holding_hand": "Hai tay kết ấn chuyển pháp luân trước ngực", "mudra": "Dharmachakra Mudra", "practical_application": "Quán tưởng gieo duyên lành sinh về cõi trời Đâu Suất."}, "associated_deities": ["Thích Ca Mâu Ni Phật", "Asanga"]},
+      {"id": "deity_green_tara", "system": "deity", "name": {"vietnamese": "Đức Lục Độ Mẫu (Green Tara)", "sanskrit": "Śyāmatārā", "tibetan": "Drolma Jangkhu"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Green+Tara", "polarity": "Cứu khổ tức thì", "element": "Sinh khí vạn vật (Sắc lục ngọc)", "classification": "Mẹ Hiền Cứu Độ / Giải thoát khỏi Bát Nạn", "symbolism": {"core_meaning": "Hiện thân cho thiện hạnh và năng lượng cứu độ nhanh chóng của chư Phật; che chở chúng sinh thoát khỏi 8 nỗi sợ hãi lớn.", "structural_breakdown": [{"part": "Chân phải duỗi xuống sẵn sàng bước", "meaning": "Luôn luôn lập tức ứng hiện cứu giúp ngay khi có tiếng kêu cầu."}, {"part": "Tay phải bắt ấn Thí Nguyện", "meaning": "Ban tặng sự bình an và mọi thành tựu."}, {"part": "Cành sen xanh Utpala hé nở", "meaning": "Sự thanh khiết và trí tuệ thấu suốt tam thời."}]}, "ritual_usage": {"holding_hand": "Tay phải ngửa lòng trên gối, tay trái cầm cành hoa sen", "mudra": "Varada Mudra & Triratna Mudra", "practical_application": "Trì tụng 21 Tán Thán Độ Mẫu và chú 'Om Tare Tuttare Ture Soha' khi nguy cấp."}, "associated_deities": ["White Tara", "Amoghasiddhi"]},
+      {"id": "deity_white_tara", "system": "deity", "name": {"vietnamese": "Đức Bạch Độ Mẫu (Tara Trắng Thất Nhãn)", "sanskrit": "Sitātārā", "tibetan": "Drolkar"}, "category_id": "bodhisattva", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=White+Tara", "polarity": "Trường thọ & Thanh tịnh", "element": "Bạch nguyệt quang thanh khiết", "classification": "Tam Bộ Tôn Trường Thọ Mật Tông", "symbolism": {"core_meaning": "Ban tặng thọ mạng dài lâu, tiêu trừ tai ách chết yểu, tịnh hóa bệnh tật và nuôi dưỡng tâm từ bi như vầng trăng rằm.", "structural_breakdown": [{"part": "Bảy con mắt từ bi (Thất Nhãn)", "meaning": "Quán sát khổ ải khắp cõi giới."}, {"part": "Sắc thân trắng muốt ngọc tuyết", "meaning": "Bản tánh vô cấu nhiễm, biểu trưng trí tuệ thanh lương."}, {"part": "Đóa sen trắng 8 cánh mãn khai", "meaning": "Sự viên mãn của Bát Chánh Đạo và công đức trường thọ."}]}, "ritual_usage": {"holding_hand": "Tay phải bắt ấn Thí Nguyện, tay trái giữ cuống sen trắng", "mudra": "Varada Mudra & Kartari Mudra", "practical_application": "Trì tụng chân ngôn 'Om Tare Tuttare Ture Mama Ayur Punya Jnana Pushtim Kuru Soha' cầu thọ mạng."}, "associated_deities": ["Amitayus", "Ushnisha Vijaya"]},
+      {"id": "deity_padmasambhava", "system": "deity", "name": {"vietnamese": "Đạo Sư Liên Hoa Sinh (Guru Rinpoche)", "sanskrit": "Padmasambhava", "tibetan": "Guru Rinpoche"}, "category_id": "guru", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Padmasambhava", "polarity": "Oai lực điều phục Tam Cõi", "element": "Hóa sinh từ hoa sen (Sắc đồng mạ vàng)", "classification": "Tổ Sư Khai Sơn Mật Tông Tây Tạng / Vị Phật Thứ Hai", "symbolism": {"core_meaning": "Đấng điều phục toàn bộ quỷ thần ma chướng cõi tuyết; truyền trao giáo pháp Mật thừa và chôn giấu kho tàng Terma cứu độ thời mạt pháp.", "structural_breakdown": [{"part": "Mũ sen gắn lông kền kền", "meaning": "Cái nhìn thấu suốt từ đỉnh cao của cảnh giới giác ngộ."}, {"part": "Chùy Kim Cang trước ngực & Bát sọ trong lòng", "meaning": "Nhiếp thâu đại bi và thọ dụng cam lồ trường thọ."}, {"part": "Trượng Khatvanga tựa vai trái", "meaning": "Hiện diện mật nhiệm của bạn đạo trí tuệ Yeshe Tsogyal."}]}, "ritual_usage": {"holding_hand": "Tay phải cầm chùy ngang tim, tay trái bưng bát sọ đỡ tích trượng", "mudra": "Vajra Mudra", "practical_application": "Trì tụng thần chú Kim Cang Đạo Sư 'Om Ah Hung Benza Guru Pema Siddhi Hung'."}, "associated_deities": ["Yeshe Tsogyal", "Mandarava"]},
+      {"id": "deity_vajrayogini", "system": "deity", "name": {"vietnamese": "Đức Kim Cang Du Già Mẫu (Vajrayogini)", "sanskrit": "Vajrayoginī", "tibetan": "Dorje Naljorma"}, "category_id": "dakini", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Vajrayogini", "polarity": "Đại Lạc & Tánh Không tối thượng", "element": "Hỏa xích đại lạc (Đỏ rực)", "classification": "Nữ Bổn Tôn Tối Thượng Du Già Mật Điển", "symbolism": {"core_meaning": "Hiện thân cho trí tuệ trực giác tối hậu; chuyển hóa trực tiếp năng lượng dục vọng thế tục thành đại lạc tánh Không.", "structural_breakdown": [{"part": "Thân sắc đỏ tươi múa trên xác chết", "meaning": "Lửa đại lạc thiêu cháy ngã chấp và sợ hãi."}, {"part": "Tay phải vung dao cong Kartika", "meaning": "Cắt đứt ngay lập tức mọi thói quen phân biệt nhị nguyên."}, {"part": "Tay trái nâng bát sọ Kapala", "meaning": "Thọ nhận và chuyển hóa độc tố thành dòng hỷ lạc."}, {"part": "Mắt ngước nhìn bầu trời Tánh Không", "meaning": "Dẫn dắt hành giả tiến thẳng về cõi Tịnh Độ Không Hành."}]}, "ritual_usage": {"holding_hand": "Tay phải cầm dao Kartika, tay trái nâng bát sọ Kapala", "mudra": "Vajrayogini Mudra", "practical_application": "Pháp tu cốt tủy của dòng Naropa trong Tối Thượng Du Già."}, "associated_deities": ["Chakrasamvara", "Naropa"]},
+      {"id": "deity_simhamukha", "system": "deity", "name": {"vietnamese": "Sư Diện Không Hành Mẫu (Dakini Mặt Sư Tử)", "sanskrit": "Siṃhamukhā", "tibetan": "Sengdongma"}, "category_id": "dakini", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Simhamukha", "polarity": "Hàng phục tà thuật & Tiêu trừ bùa ngải", "element": "Lôi hỏa uy dũng vô biên", "classification": "Phẫn Nộ Trí Tuệ Dakini / Hóa Thân Guru Rinpoche", "symbolism": {"core_meaning": "Tiếng gầm sư tử phá tan bùa chú đen tối, tà thuật hiểm độc, năng lượng âm u ám và ác mộng quấy phá.", "structural_breakdown": [{"part": "Đầu sư tử tuyết gầm rống với nanh nhọn", "meaning": "Sự vô úy dũng mãnh đập nát mọi ảo giác và tà khí."}, {"part": "Thân sắc xanh đen nhảy múa trên tử thi", "meaning": "Chiến thắng hoàn toàn tử ma và ngã tướng."}, {"part": "Tay cầm dao Kartika và bát sọ rực lửa", "meaning": "Tiêu trừ gốc rễ ngã mạn và chuyển hóa phiền não."}]}, "ritual_usage": {"holding_hand": "Tay phải giơ cao dao cong, tay trái cầm bát sọ ngang tim", "mudra": "Múa vũ điệu Kim Cương Cham hàng ma", "practical_application": "Nghi quỹ đẩy lùi bùa ngải, dịch bệnh hiểm độc và tà thuật trù ếm."}, "associated_deities": ["Padmasambhava", "Yeshe Tsogyal"]},
+      {"id": "deity_kurukulle", "system": "deity", "name": {"vietnamese": "Đức Phật Mẫu Tara Đỏ (Tác Minh Phật Mẫu)", "sanskrit": "Kurukullā", "tibetan": "Rigchema"}, "category_id": "dakini", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Kurukulle", "polarity": "Hoài Cảm & Quyền Lực Từ Bi", "element": "Hỏa hồng quyến rũ (Đỏ hoa sen)", "classification": "Nữ Bổn Tôn Chủ Về Sự Hoài Phục", "symbolism": {"core_meaning": "Chuyển hóa năng lượng ái dục phàm phu thành năng lực quy phục nhân tâm, thu hút sự kính ngưỡng và chuyển hóa ma chướng.", "structural_breakdown": [{"part": "Cung tên làm bằng hoa sen đỏ Utpala", "meaning": "Bắn xuyên qua trái tim u mê, khơi dậy tình thương và bồ-đề tâm."}, {"part": "Dây thòng lọng hoa và móc câu sắt", "meaning": "Câu thúc và kéo chặt chúng sinh quay về chánh đạo."}, {"part": "Thân sắc đỏ ngọc ruby khiêu vũ", "meaning": "Ngọn lửa đại lạc ấm áp thiêu đốt sự lạnh lùng ích kỷ."}]}, "ritual_usage": {"holding_hand": "Bốn tay giương cung tên hoa sen và cầm móc câu", "mudra": "Cung Xạ Thủ Ấn", "practical_application": "Thực hành pháp Hoài Cảm tăng trưởng uy tín, tài lãnh đạo và sự hòa hợp."}, "associated_deities": ["Amitabha", "Hevajra"]},
+      {"id": "deity_cundi", "system": "deity", "name": {"vietnamese": "Đức Phật Mẫu Chuẩn Đề (Thất Câu Chi Phật Mẫu)", "sanskrit": "Cundī", "tibetan": "Chunti"}, "category_id": "dakini", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Cundi", "polarity": "Từ Mẫu bảo hộ tiêu tai", "element": "Hoàng bạch quang minh viên mãn", "classification": "Mẹ Của Bảy Trăm Ức Chư Phật", "symbolism": {"core_meaning": "Năng lượng từ ái vô biên bảo bọc che chở con thơ, đáp ứng mọi sở cầu thiện lành, tiêu trừ tai ách nghiệp chướng.", "structural_breakdown": [{"part": "Mười tám cánh tay cầm đủ loại pháp khí", "meaning": "Mười tám pháp bất cộng của Phật và thiện xảo hóa độ."}, {"part": "Hai tay kết Chuẩn Đề Căn Bản Ấn", "meaning": "Sự hội tụ tối thượng của tâm định tĩnh và đại lực."}, {"part": "Ngồi kiết già trên đài sen đỡ bởi Long Vương", "meaning": "Nhiếp phục muôn loài rồng rắn và loài thủy tộc."}]}, "ritual_usage": {"holding_hand": "Hai tay chính kết ấn Chuẩn Đề trước ngực, 16 tay phụ xòe cầm bảo bối", "mudra": "Cundī Mudra", "practical_application": "Trì tụng thần chú Chuẩn Đề cầu tiêu tai, thông tuệ, bình an cho gia đạo."}, "associated_deities": ["Avalokiteshvara", "Vajrapani"]},
+      {"id": "deity_sitatapatra", "system": "deity", "name": {"vietnamese": "Bạch Tán Cái Phật Mẫu (Đại Lực Hộ Mạng)", "sanskrit": "Sitātapatrā", "tibetan": "Dukkar"}, "category_id": "dakini", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Sitatapatra", "polarity": "Hộ trì & Che chở tuyệt đối", "element": "Bạch kim kim cương quang", "classification": "Hóa Thân Từ Nhục Kế Của Đức Thích Ca", "symbolism": {"core_meaning": "Chiếc lọng trắng che khắp tam giới, dập tắt thiên tai, súng đạn chiến tranh, bùa chú ma thuật độc hại.", "structural_breakdown": [{"part": "Chiếc lọng trắng vươn cao", "meaning": "Lá chắn kim cương bảo hộ chúng sinh khỏi ác nghiệp trần gian."}, {"part": "Nghìn đầu nghìn tay dẫm lên ma quỷ", "meaning": "Nhìn thấu và nghiền nát mọi mối nguy hiểm trong vũ trụ."}, {"part": "Bánh xe Chánh Pháp trong tay", "meaning": "Phá vỡ gông cùm si ám của tà giáo ngoại đạo."}]}, "ritual_usage": {"holding_hand": "Tay chính cầm chiếc lọng trắng che chở, các tay phụ cầm binh khí", "mudra": "Trì Tán Thủ Ấn", "practical_application": "Trì tụng Bạch Tán Cái Thần Chú trấn trạch, dẹp trừ tà thuật hiểm ác."}, "associated_deities": ["Thích Ca Mâu Ni Phật", "Tara"]},
+      {"id": "deity_parnashavari", "system": "deity", "name": {"vietnamese": "Đại Bách Hợp Y Mẫu (Bồ Tát Diệp Y)", "sanskrit": "Parṇaśavarī", "tibetan": "Loma Gyoma"}, "category_id": "dakini", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Parnashavari", "polarity": "Tiêu trừ dịch bệnh & Ô nhiễm sinh thái", "element": "Mộc đại rừng già thanh lọc", "classification": "Bổn Tôn Trị Liệu Dịch Bệnh Truyền Nhiễm", "symbolism": {"core_meaning": "Năng lượng thanh lọc của rừng già đại ngàn, chữa lành dịch bệnh lạ, virus lây lan và bảo hộ mùa màng.", "structural_breakdown": [{"part": "Y phục kết từ lá cây thảo dược", "meaning": "Sự chữa lành hòa hợp tuyệt đối với linh khí vũ trụ."}, {"part": "Ba mặt sáu tay cầm cành cây thuốc và rìu báu", "meaning": "Chặt đứt mầm mống mầm bệnh và ban thảo dược cứu mạng."}, {"part": "Tư thế đạp lên các mầm mống dịch quỷ", "meaning": "Chế ngự hoàn toàn các loại vi trùng và khí độc."}]}, "ritual_usage": {"holding_hand": "Cầm cành cây thảo dược, rìu báu, mũi tên và cung hoa", "mudra": "Thủ ấn trị liệu dịch bệnh", "practical_application": "Trì tụng chân ngôn khi xảy ra đại dịch hoặc môi trường bị ô nhiễm."}, "associated_deities": ["Amoghasiddhi", "Bhaisajyaguru"]},
+      {"id": "deity_vajrakilaya", "system": "deity", "name": {"vietnamese": "Kim Cang Phổ Ba (Vajrakilaya Heruka)", "sanskrit": "Vajrakīlaya", "tibetan": "Dorje Phurba"}, "category_id": "dharmapala", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Vajrakilaya", "polarity": "Hàng ma phẫn nộ tối thượng", "element": "Hắc hỏa lôi điện cuộn trào", "classification": "Bổn Tôn Phẫn Nộ Diệt Trừ Mọi Chướng Ngại", "symbolism": {"core_meaning": "Hiện thân phẫn nộ của sự nghiệp giác ngộ; ghim chặt và tiêu diệt vĩnh viễn mầm mống ma chướng và bản ngã kiên cố.", "structural_breakdown": [{"part": "Ba mặt chín mắt, đôi cánh lửa", "meaning": "Tự tại bay lượn trên bầu trời Tánh Không đập tan sợ hãi."}, {"part": "Hai tay chính xoay chùy Phổ Ba nhọn", "meaning": "Ghim chặt và chuyển hóa năng lượng ma quỷ thành thanh tịnh."}, {"part": "Bốn tay phụ cầm chùy và đao kiếm", "meaning": "Chặt đứt mọi liên hệ của nghiệp chướng trói buộc."}]}, "ritual_usage": {"holding_hand": "Hai tay trước ngực xoay chùy Phổ Ba, các tay phụ giương vũ khí", "mudra": "Kīla Mudra", "practical_application": "Đại lễ trừ tà cuối năm, bảo vệ hành giả trước bước ngoặt tâm linh."}, "associated_deities": ["Padmasambhava", "Vajrasattva"]},
+      {"id": "deity_mahakala", "system": "deity", "name": {"vietnamese": "Đại Hắc Thiên (Mahakala Sáu Tay)", "sanskrit": "Mahākāla", "tibetan": "Gonpo Nakpo"}, "category_id": "dharmapala", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Mahakala", "polarity": "Hàng ma phẫn nộ cực độ", "element": "Hắc thạch vô tận (Đen tuyền)", "classification": "Hộ Pháp Mật Trí Hàng Đầu / Hóa thân Quán Thế Âm", "symbolism": {"core_meaning": "Oai lực phẫn nộ của lòng từ bi nhằm đập tan hiểm họa, bảo vệ chánh pháp và trừ mọi chướng duyên tu tập.", "structural_breakdown": [{"part": "Sắc thân đen kịt dẫm lên chướng quỷ", "meaning": "Pháp thân bất biến vượt lên mọi sắc tướng biến hoại."}, {"part": "Ba mắt đỏ trừng và bốn nanh nhọn", "meaning": "Nhìn thấu ba cõi và nghiền nát độc tố tham sân si."}, {"part": "Sáu tay cầm vũ khí bảo hộ", "meaning": "Cứu độ toàn diện 6 cõi và lục độ Ba-la-mật."}, {"part": "Quầng lửa trí tuệ bốc cháy quanh thân", "meaning": "Thiêu rụi sạch sẽ mọi ác nghiệp quấy nhiễu đàn tràng."}]}, "ritual_usage": {"holding_hand": "Cầm giữ 6 pháp bảo phẫn nộ", "mudra": "Ấn Hàng Ma Phẫn Nộ", "practical_application": "Nghi thức dâng Torma và hồi hướng cúng dường Hộ Pháp mỗi chiều tối."}, "associated_deities": ["Avalokiteshvara", "Palden Lhamo"]},
+      {"id": "deity_palden_lhamo", "system": "deity", "name": {"vietnamese": "Cát Tường Thiên Mẫu (Palden Lhamo)", "sanskrit": "Śrī Devī", "tibetan": "Palden Lhamo"}, "category_id": "dharmapala", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Palden+Lhamo", "polarity": "Nữ Hộ Pháp tối cao uy dũng", "element": "Bão táp phong ba và biển máu", "classification": "Hộ Pháp Trấn Quốc Bảo Hộ Đạt-lai Lạt-ma", "symbolism": {"core_meaning": "Vị Nữ Hộ Pháp tối thượng bảo vệ Phật pháp toàn xứ Tây Tạng, trừng phạt kẻ phá giới và che chở cho người tu chân chính.", "structural_breakdown": [{"part": "Cưỡi con la trắng vượt biển máu", "meaning": "Vượt thoát khỏi luân hồi hiểm ác một cách tự tại vô úy."}, {"part": "Mặt trời nơi rốn và mặt trăng trên tóc", "meaning": "Sự hội tụ tối thượng của Trí tuệ và Phương tiện."}, {"part": "Tay vung gậy gỗ đàn hương gắn chùy", "meaning": "Giáng đòn trừng phạt thẳng tay lên các thế lực hắc ám."}]}, "ritual_usage": {"holding_hand": "Tay phải vung chùy gỗ, tay trái bưng bát sọ chứa cam lồ", "mudra": "Hàng Ma Thủ Ấn", "practical_application": "Cầu nguyện bảo hộ quốc gia, dòng tu và bói quẻ hồ thiêng Lhamo La-tso."}, "associated_deities": ["Mahakala", "Dalai Lama"]},
+      {"id": "deity_garuda", "system": "deity", "name": {"vietnamese": "Đại Bàng Kim Sí Điểu (Garuda / Khyung)", "sanskrit": "Garuḍa", "tibetan": "Khyung"}, "category_id": "dharmapala", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Garuda", "polarity": "Khắc tinh của loài rắn độc & Bệnh tật", "element": "Kim hỏa dũng mãnh", "classification": "Linh Thú Hộ Pháp Phẫn Nộ Mật Tông", "symbolism": {"core_meaning": "Khắc chế loài rồng độc Naga gây bệnh nan y ngoài da, phong hủi, ung thư và năng lượng độc hại u ám.", "structural_breakdown": [{"part": "Thân người mỏ và cánh đại bàng", "meaning": "Tự do tung cánh trên không trung không bị ngăn ngại."}, {"part": "Mỏ ngậm và móng vuốt xé xác mãng xà", "meaning": "Tiêu diệt độc tố sân hận và âm tà dưới lòng đất."}, {"part": "Cặp sừng nhọn giữa trán gắn bảo châu", "meaning": "Uy lực sấm sét và trí giác kim cương."}]}, "ritual_usage": {"holding_hand": "Móng vuốt quắp rắn naga, hai cánh xòe rộng", "mudra": "Garuda Mudra", "practical_application": "Trị liệu các bệnh phong ngứa, động kinh do Long thần quấy nhiễu."}, "associated_deities": ["Vajrapani", "Hayagriva"]},
+      {"id": "deity_chitipati", "system": "deity", "name": {"vietnamese": "Cặp Đôi Chúa Tể Nghĩa Trang (Chitipati)", "sanskrit": "Citipati", "tibetan": "Durtro Dagpo"}, "category_id": "dharmapala", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Chitipati", "polarity": "Quán niệm Vô Thường sâu sắc", "element": "Bạch cốt kim cương bất hoại", "classification": "Hộ Pháp Nghĩa Trang & Pháp Tu Chöd", "symbolism": {"core_meaning": "Hai bộ xương khô khiêu vũ trong ngọn lửa hoan lạc, biểu thị cái chết của bản ngã giả tạo và sự bất tử của tâm Phật tánh.", "structural_breakdown": [{"part": "Hai bộ cốt quấn quýt khiêu vũ", "meaning": "Hợp nhất Bất Nhị vượt qua phân biệt giới tính trần thế."}, {"part": "Tay cầm gậy đầu lâu Kinkara và bát sọ", "meaning": "Vũ khí chỉ thẳng vào chân lý hoại diệt của thân xác."}, {"part": "Ngọn lửa rực cháy quanh nghĩa địa", "meaning": "Lửa trí tuệ thiêu đốt sạch sẽ sự bám chấp thân xác."}]}, "ritual_usage": {"holding_hand": "Múa vũ điệu Kim Cương Cham trong tư thế đan chân", "mudra": "Vũ Điệu Bạch Cốt", "practical_application": "Pháp quán thiền định về vô thường nơi tha ma địa và bảo vệ hành giả Chöd."}, "associated_deities": ["Chakrasamvara", "Vajrayogini"]},
+      {"id": "deity_hayagriva_garuda_vajrapani", "system": "deity", "name": {"vietnamese": "Tam Bộ Hợp Nhất (Kim Cang Thủ - Mã Đầu - Kim Sí Điểu)", "sanskrit": "Vajrapāṇi-Hayagrīva-Garuḍa", "tibetan": "Chador Tamdrin Khyungsum"}, "category_id": "dharmapala", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Hayagriva+Garuda+Vajrapani", "polarity": "Hàng phục Tam Giới vô song", "element": "Lôi hỏa sấm sét tuyệt đối", "classification": "Tam Tôn Hợp Thể Trừ Tà Cực Uy Lực", "symbolism": {"core_meaning": "Sức mạnh kết hợp quét sạch chướng ngại từ cả ba cõi: cõi trời (Mã Đầu Minh Vương), cõi đất (Kim Cang Thủ) và cõi nước (Garuda).", "structural_breakdown": [{"part": "Thân thể đen lam của Kim Cang Thủ", "meaning": "Sức mạnh đập tan tà ma cõi trần gian."}, {"part": "Đầu ngựa xanh hí vang trên đỉnh tóc", "meaning": "Tiếng hí thức tỉnh tam giới của Mã Đầu Minh Vương."}, {"part": "Cánh và móng vuốt của Garuda", "meaning": "Quét sạch độc long Naga quấy nhiễu dưới lòng đất."}]}, "ritual_usage": {"holding_hand": "Cầm chùy kim cương, thừng lửa và dẫm lên ma quỷ", "mudra": "Tam Bộ Phẫn Nộ Thủ Ấn", "practical_application": "Hóa giải các trường hợp bị bùa ngải nặng, phong thủy tà khí xâm chiếm lâu năm."}, "associated_deities": ["Vajrapani", "Hayagriva", "Garuda"]},
+      {"id": "deity_yellow_jambhala", "system": "deity", "name": {"vietnamese": "Hoàng Tài Thần (Yellow Jambhala)", "sanskrit": "Jambhala (Kubera)", "tibetan": "Dzambala Serpo"}, "category_id": "wealth", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Jambhala", "polarity": "Tăng ích sung túc", "element": "Kim ngân châu báu (Sắc vàng trù phú)", "classification": "Chủ Quản Kho Tàng / Tiêu trừ nghèo khó", "symbolism": {"core_meaning": "Ban phát tài bảo, phương tiện vật chất dồi dào để hành giả giải tỏa gánh nặng sinh kế, an tâm tu tập Phật pháp.", "structural_breakdown": [{"part": "Thân hình mập mạp ngồi tự tại", "meaning": "Sự đủ đầy trọn vẹn về phước báu và trí tuệ."}, {"part": "Tay phải giữ trái Bijapura trường thọ", "meaning": "Hạt giống của cải thiện lành và sức khỏe."}, {"part": "Tay trái ôm chuột nhả ngọc Neula", "meaning": "Kho báu tuôn trào ngọc ngà cứu giúp người nghèo khó."}, {"part": "Chân phải đạp lên vỏ ốc biển trắng", "meaning": "Chế ngự tâm tham lam bủn xỉn."}]}, "ritual_usage": {"holding_hand": "Tay phải đặt trên gối cầm quả, tay trái ôm chặt chuột nhả ngọc", "mudra": "Varada Mudra", "practical_application": "Nghi thức tưới nước sái thủy lên đỉnh đầu tượng kèm trì tụng chân ngôn."}, "associated_deities": ["Ratnasambhava", "Vaishravana"]},
+      {"id": "deity_black_jambhala", "system": "deity", "name": {"vietnamese": "Hắc Tài Thần (Black Jambhala)", "sanskrit": "Kāla Jambhala", "tibetan": "Dzambala Nakpo"}, "category_id": "wealth", "fallback_url": "https://placehold.co/600x400/0f172a/d97706?text=Black+Jambhala", "polarity": "Phẫn nộ trừ cùng quẫn", "element": "Hắc kim thạch thần bí", "classification": "Chủ Trị Khủng Hoảng Tài Chính & Cứu Bần Cùng", "symbolism": {"core_meaning": "Hiện thân phẫn nộ diệt trừ tận gốc nghiệp chướng gây nên cảnh bần hàn cùng cực, giải nguy tài chính trong gang tấc.", "structural_breakdown": [{"part": "Thân hình lùn mập khỏa thân màu đen", "meaning": "Tánh Không trần trụi vượt thoát định kiến giàu nghèo."}, {"part": "Dẫm chân lên xác chết của sự nghèo đói", "meaning": "Đè bẹp và tiêu diệt hạt giống túng thiếu bần hàn."}, {"part": "Tay cầm bát sọ và chuột nhả ngọc đen", "meaning": "Chuyển hóa khổ đau thiếu thốn thành của cải thiện lành."}]}, "ritual_usage": {"holding_hand": "Tay phải bưng bát sọ trước ngực, tay trái ôm chuột nhả ngọc", "mudra": "Phẫn Nộ Tài Bảo Thủ Ấn", "practical_application": "Tưới nước cúng dường lên rốn tượng kèm chân ngôn."}, "associated_deities": ["Akshobhya", "Kubera"]}
+    ];
+
+    const CATEGORIES = {
+      core: { label: "Pháp Khí Cốt Lõi", system: "phap_khi" },
+      wrathful: { label: "Vũ Khí & Hàng Phục", system: "phap_khi" },
+      musical: { label: "Nghi Nhạc Khí", system: "phap_khi" },
+      offering: { label: "Cúng Dường & Hỏa Đàn", system: "phap_khi" },
+      protection: { label: "Hộ Trì & Du Già", system: "phap_khi" },
+      buddha_adibuddha: { label: "Bản Sơ Phật", system: "deity" },
+      buddha_dhyani: { label: "Ngũ Trí Như Lai", system: "deity" },
+      buddha_purification: { label: "Phật Tịnh Hóa", system: "deity" },
+      buddha_healing: { label: "Phật Dược Sư", system: "deity" },
+      bodhisattva: { label: "Chư Đại Bồ Tát", system: "deity" },
+      guru: { label: "Bậc Đạo Sư", system: "deity" },
+      dakini: { label: "Không Hành Mẫu", system: "deity" },
+      dharmapala: { label: "Chư Hộ Pháp", system: "deity" },
+      wealth: { label: "Chư Tôn Tài Bảo", system: "deity" }
+    };
+
+    const MANDALA_COORDS = {
+      "deity_vajradhara": { layer: 0, r: 0, theta: 0, color: "#60a5fa", parentId: null },
+      "deity_samantabhadra": { layer: 0, r: 40, theta: -90, color: "#38bdf8", parentId: null },
+      "deity_vairocana": { layer: 1, r: 85, theta: -90, color: "#ffffff", parentId: "deity_vajradhara" },
+      "deity_akshobhya": { layer: 1, r: 175, theta: 0, color: "#38bdf8", parentId: "deity_vajradhara" },
+      "deity_ratnasambhava": { layer: 1, r: 175, theta: 90, color: "#fbbf24", parentId: "deity_vajradhara" },
+      "deity_amitabha": { layer: 1, r: 175, theta: 180, color: "#f87171", parentId: "deity_vajradhara" },
+      "deity_amoghasiddhi": { layer: 1, r: 175, theta: 270, color: "#4ade80", parentId: "deity_vajradhara" },
+      "deity_vajrasattva": { layer: 2, r: 220, theta: 25, color: "#e2e8f0", parentId: "deity_akshobhya" },
+      "deity_bhaisajyaguru": { layer: 2, r: 220, theta: -25, color: "#38bdf8", parentId: "deity_akshobhya" },
+      "deity_yellow_jambhala": { layer: 2, r: 220, theta: 115, color: "#facc15", parentId: "deity_ratnasambhava" },
+      "deity_chenrezig": { layer: 2, r: 220, theta: 165, color: "#fca5a5", parentId: "deity_amitabha" },
+      "deity_avalokiteshvara_1000": { layer: 2, r: 220, theta: 195, color: "#fed7aa", parentId: "deity_amitabha" },
+      "deity_green_tara": { layer: 2, r: 220, theta: 255, color: "#86efac", parentId: "deity_amoghasiddhi" },
+      "deity_white_tara": { layer: 2, r: 220, theta: 285, color: "#f1f5f9", parentId: "deity_amoghasiddhi" },
+      "deity_manjushri": { layer: 2, r: 220, theta: 65, color: "#f59e0b", parentId: "deity_vairocana" },
+      "deity_padmasambhava": { layer: 2, r: 220, theta: 140, color: "#fb923c", parentId: "deity_amitabha" },
+      "deity_vajrapani": { layer: 3, r: 270, theta: 15, color: "#60a5fa", parentId: "deity_akshobhya" },
+      "deity_vajrakilaya": { layer: 3, r: 270, theta: -20, color: "#f43f5e", parentId: "deity_akshobhya" },
+      "deity_mahakala": { layer: 3, r: 270, theta: 180, color: "#93c5fd", parentId: "deity_chenrezig" },
+      "deity_palden_lhamo": { layer: 3, r: 270, theta: 210, color: "#cbd5e1", parentId: "deity_mahakala" },
+      "deity_vajrayogini": { layer: 3, r: 270, theta: 150, color: "#ef4444", parentId: "deity_amitabha" },
+      "deity_kurukulle": { layer: 3, r: 270, theta: 135, color: "#f43f5e", parentId: "deity_amitabha" },
+      "deity_simhamukha": { layer: 3, r: 270, theta: 300, color: "#38bdf8", parentId: "deity_padmasambhava" },
+      "deity_garuda": { layer: 3, r: 270, theta: 330, color: "#fbbf24", parentId: "deity_amoghasiddhi" },
+      "deity_black_jambhala": { layer: 3, r: 270, theta: 45, color: "#94a3b8", parentId: "deity_akshobhya" },
+      "deity_chitipati": { layer: 3, r: 270, theta: 75, color: "#e2e8f0", parentId: "deity_vajrayogini" },
+      "deity_hayagriva_garuda_vajrapani": { layer: 3, r: 270, theta: -45, color: "#dc2626", parentId: "deity_vajrapani" }
+    };
+
+    let userImages = {}; 
+    let currentTargetId = null;
+    let currentSystem = 'all'; 
+    let currentCategory = 'all';
+    let currentViewMode = 'grid';
+    let currentRotation = 0;
+
+    function resolveImagePath(item) {
+      if (userImages[item.id]) return userImages[item.id];
+      if (item.system === 'phap_khi') return `phapkhi/${item.id}.jpg`;
+      if (item.system === 'deity') return `bo_ton/${item.id}.jpg`;
+      return item.fallback_url;
+    }
+
+    const DB_NAME = "PhapKhiDB";
+    const STORE_NAME = "imagesStore";
+
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        try {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME, { keyPath: "id" });
+            }
+          };
+          req.onsuccess = (e) => resolve(e.target.result);
+          req.onerror = (e) => reject(e.target.error);
+        } catch(err) {
+          reject(err);
+        }
+      });
+    }
+
+    async function loadAllSavedImages() {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.getAll();
+        req.onsuccess = () => {
+          const records = req.result || [];
+          records.forEach(r => { userImages[r.id] = r.dataUrl; });
+          if (currentViewMode === 'grid') filterData();
+          else renderMandalaNodes();
+        };
+      } catch (err) {
+        console.warn("Chế độ Offline dùng ảnh mặc định.");
+      }
+    }
+
+    async function saveImageToDB(id, dataUrl) {
+      userImages[id] = dataUrl;
+      try {
+        const db = await initDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.put({ id: id, dataUrl: dataUrl });
+      } catch (err) {
+        console.error("Lỗi lưu ảnh:", err);
+      }
+    }
+
+    function triggerSingleUpload(id, e) {
+      const evt = e || window.event;
+      if (evt && evt.stopPropagation) evt.stopPropagation();
+      currentTargetId = id;
+      document.getElementById('singleFileInput').click();
+    }
+
+    function handleSingleUpload(e) {
+      const evt = e || window.event;
+      const file = evt.target.files[0];
+      if (!file || !currentTargetId) return;
+
+      const reader = new FileReader();
+      reader.onload = function(eventResult) {
+        const dataUrl = eventResult.target.result;
+        saveImageToDB(currentTargetId, dataUrl);
+        if (currentViewMode === 'grid') filterData();
+        else renderMandalaNodes();
+
+        const modalImg = document.getElementById('modalImageDisplay');
+        if (modalImg && currentTargetId) modalImg.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+      evt.target.value = '';
+    }
+
+    function handleBatchUpload(e) {
+      const evt = e || window.event;
+      const files = Array.from(evt.target.files);
+      if (!files.length) return;
+
+      let matchedCount = 0;
+      files.forEach(file => {
+        const fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+        const cleanName = fileName.trim().toLowerCase();
+
+        const matchedItem = VAJRAYANA_MASTER_DATA.find(item => 
+          item.id.toLowerCase() === cleanName ||
+          item.name.vietnamese.toLowerCase().includes(cleanName) ||
+          item.name.sanskrit.toLowerCase().includes(cleanName) ||
+          cleanName.includes(item.id.toLowerCase())
+        );
+
+        if (matchedItem) {
+          const reader = new FileReader();
+          reader.onload = function(eventResult) {
+            saveImageToDB(matchedItem.id, eventResult.target.result);
+            if (currentViewMode === 'grid') filterData();
+            else renderMandalaNodes();
+          };
+          reader.readAsDataURL(file);
+          matchedCount++;
+        }
+      });
+
+      alert(`Đã nhận diện và cập nhật thành công ${matchedCount} ảnh.`);
+      evt.target.value = '';
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      const gridBtn = document.getElementById('viewModeGrid');
+      const mandalaBtn = document.getElementById('viewModeMandala');
+      const gridContainer = document.getElementById('gridViewContainer');
+      const mandalaContainer = document.getElementById('mandalaViewContainer');
+      const categoryBar = document.getElementById('categoryBar');
+      const systemSelectorWrap = document.getElementById('systemSelectorWrap');
+      const bannerText = document.getElementById('bannerText');
+
+      if (mode === 'grid') {
+        gridBtn.className = "px-3 py-1 text-xs rounded-lg font-semibold bg-amber-500 text-slate-950 transition flex items-center gap-1";
+        mandalaBtn.className = "px-3 py-1 text-xs rounded-lg font-semibold text-slate-300 hover:text-white transition flex items-center gap-1";
+        gridContainer.classList.remove('hidden');
+        mandalaContainer.classList.add('hidden');
+        mandalaContainer.classList.remove('flex');
+        categoryBar.classList.remove('hidden');
+        systemSelectorWrap.classList.remove('hidden');
+        if (bannerText) bannerText.innerHTML = "<b>Mẹo xem ảnh:</b> Trong bảng chi tiết, <b>nhấp thẳng vào hình ảnh</b> để xem phóng to toàn màn hình sắc nét.";
+        filterData();
+      } else {
+        mandalaBtn.className = "px-3 py-1 text-xs rounded-lg font-semibold bg-amber-500 text-slate-950 transition flex items-center gap-1";
+        gridBtn.className = "px-3 py-1 text-xs rounded-lg font-semibold text-slate-300 hover:text-white transition flex items-center gap-1";
+        gridContainer.classList.add('hidden');
+        mandalaContainer.classList.remove('hidden');
+        mandalaContainer.classList.add('flex');
+        categoryBar.classList.add('hidden');
+        systemSelectorWrap.classList.add('hidden');
+        if (bannerText) bannerText.innerHTML = "<b>Chế độ Mạn-đà-la:</b> Rê chuột để kết nối tia năng lượng về Phật Bản Sư, <b>bấm vào nốt</b> để xem chi tiết tôn tượng.";
+        renderMandalaNodes();
+      }
+    }
+
+    function setSystem(sys) {
+      currentSystem = sys;
+      currentCategory = 'all';
+
+      document.querySelectorAll('.sys-btn').forEach(btn => {
+        btn.classList.remove('bg-amber-500', 'text-slate-950');
+        btn.classList.add('text-slate-300');
+      });
+
+      const activeBtn = sys === 'all' ? document.getElementById('sys-all') :
+                        sys === 'phap_khi' ? document.getElementById('sys-phapkhi') :
+                        document.getElementById('sys-deity');
+      if (activeBtn) {
+        activeBtn.classList.add('bg-amber-500', 'text-slate-950');
+        activeBtn.classList.remove('text-slate-300');
+      }
+
+      renderCategoryTabs();
+      filterData();
+    }
+
+    function selectCategory(catKey) {
+      currentCategory = catKey;
+      renderCategoryTabs();
+      filterData();
+    }
+
+    function renderCategoryTabs() {
+      const tabsContainer = document.getElementById('categoryTabs');
+      if (!tabsContainer) return;
+      tabsContainer.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.className = `cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium transition ${currentCategory === 'all' ? 'active bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/60'}`;
+      allBtn.innerText = 'Tất Cả Thể Loại';
+      allBtn.onclick = () => selectCategory('all');
+      tabsContainer.appendChild(allBtn);
+
+      Object.keys(CATEGORIES).forEach(catKey => {
+        const cat = CATEGORIES[catKey];
+        if (currentSystem === 'all' || cat.system === currentSystem) {
+          const btn = document.createElement('button');
+          btn.className = `cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium transition ${currentCategory === catKey ? 'active bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/60'}`;
+          btn.innerText = cat.label;
+          btn.onclick = () => selectCategory(catKey);
+          tabsContainer.appendChild(btn);
+        }
+      });
+    }
+
+    function filterData() {
+      const input = document.getElementById('searchInput');
+      const query = input ? input.value.toLowerCase().trim() : '';
+      
+      const filtered = VAJRAYANA_MASTER_DATA.filter(item => {
+        const matchSys = (currentSystem === 'all' || item.system === currentSystem);
+        const matchCat = (currentCategory === 'all' || item.category_id === currentCategory);
+        const matchQuery = !query || 
+          item.name.vietnamese.toLowerCase().includes(query) ||
+          item.name.sanskrit.toLowerCase().includes(query) ||
+          item.name.tibetan.toLowerCase().includes(query) ||
+          item.symbolism.core_meaning.toLowerCase().includes(query) ||
+          item.associated_deities.some(d => d.toLowerCase().includes(query));
+        return matchSys && matchCat && matchQuery;
+      });
+
+      renderCards(filtered);
+    }
+
+    function renderCards(items) {
+      const cardsGrid = document.getElementById('cardsGrid');
+      const statusCount = document.getElementById('statusCount');
+      if (!cardsGrid) return;
+      cardsGrid.innerHTML = '';
+
+      if (statusCount) {
+        statusCount.innerText = `Hiển thị ${items.length} / ${VAJRAYANA_MASTER_DATA.length} mục bản ghi Mật Tông`;
+      }
+
+      if (items.length === 0) {
+        cardsGrid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-slate-400">
+            <span class="text-3xl block mb-2">🔍</span>
+            Không tìm thấy bản ghi nào khớp với điều kiện tìm kiếm.
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "group bg-slate-900/70 border border-slate-800 hover:border-amber-500/60 transition duration-300 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1";
+        card.onclick = () => openModal(item);
+
+        const activeImgSrc = resolveImagePath(item);
+        const hasCustom = !!userImages[item.id];
+        const isDeity = item.system === 'deity';
+
+        card.innerHTML = `
+          <div>
+            <div class="h-56 w-full bg-slate-950/90 overflow-hidden relative border-b border-slate-800/80 flex items-center justify-center p-2">
+              <img 
+                id="card-img-${item.id}"
+                src="${activeImgSrc}" 
+                alt="${item.name.vietnamese}" 
+                class="w-full h-full object-contain group-hover:scale-105 transition duration-500"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='https://placehold.co/600x600/0f172a/d97706?text=${encodeURIComponent(item.name.sanskrit)}';"
+              />
+              <span class="absolute top-2.5 right-2.5 text-[11px] font-semibold bg-black/75 backdrop-blur text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                ${item.name.tibetan}
+              </span>
+
+              <span class="absolute top-2.5 left-2.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur border ${isDeity ? 'bg-amber-950/80 text-amber-300 border-amber-500/40' : 'bg-teal-950/80 text-teal-300 border-teal-500/40'}">
+                ${isDeity ? 'Bổn Tôn' : 'Pháp Khí'}
+              </span>
+
+              <button 
+                onclick="triggerSingleUpload('${item.id}', event || window.event)" 
+                class="absolute bottom-2.5 right-2.5 text-[11px] font-medium bg-slate-900/85 hover:bg-amber-600 text-slate-200 hover:text-white border border-slate-700/80 hover:border-amber-500 px-2.5 py-1 rounded-lg transition backdrop-blur shadow flex items-center gap-1"
+                title="Thay đổi ảnh cho mục này"
+              >
+                📷 ${hasCustom ? 'Đổi ảnh' : 'Chọn ảnh'}
+              </button>
+            </div>
+            
+            <div class="p-4">
+              <h2 class="font-bold text-base text-amber-300 group-hover:text-amber-400 transition mb-1 leading-snug">
+                ${item.name.vietnamese}
+              </h2>
+              <p class="text-xs text-slate-400 italic mb-2">${item.name.sanskrit}</p>
+              <p class="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                ${item.symbolism.core_meaning}
+              </p>
+            </div>
+          </div>
+
+          <div class="px-4 py-3 bg-slate-950/40 border-t border-slate-800/60 flex justify-between items-center text-[11px] text-slate-400">
+            <span class="truncate max-w-[140px]">${CATEGORIES[item.category_id]?.label || item.classification}</span>
+            <span class="text-amber-400 font-medium group-hover:translate-x-0.5 transition flex items-center gap-1">
+              Chi tiết →
+            </span>
+          </div>
+        `;
+        cardsGrid.appendChild(card);
+      });
+    }
+
+    function renderMandalaNodes() {
+      const container = document.getElementById('nodesContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      const center = 340;
+
+      const query = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+
+      Object.keys(MANDALA_COORDS).forEach(deityId => {
+        const item = VAJRAYANA_MASTER_DATA.find(d => d.id === deityId);
+        if (!item) return;
+
+        if (query && !item.name.vietnamese.toLowerCase().includes(query) && !item.name.sanskrit.toLowerCase().includes(query)) {
+          return;
+        }
+
+        const coord = MANDALA_COORDS[deityId];
+        const rad = (coord.theta * Math.PI) / 180;
+        const x = center + coord.r * Math.cos(rad);
+        const y = center + coord.r * Math.sin(rad);
+
+        const nodeEl = document.createElement('div');
+        nodeEl.className = 'absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer flex flex-col items-center group node-transition z-10';
+        nodeEl.style.left = `${x}px`;
+        nodeEl.style.top = `${y}px`;
+        nodeEl.dataset.id = item.id;
+
+        const sizeClass = coord.layer === 0 ? 'w-14 h-14 ring-4 ring-amber-400/60' :
+                          coord.layer === 1 ? 'w-11 h-11 ring-2 ring-white/50' :
+                          coord.layer === 2 ? 'w-9 h-9 ring-1 ring-amber-400/40' : 'w-8 h-8 ring-1 ring-slate-500/40';
+
+        const activeImgSrc = resolveImagePath(item);
+
+        nodeEl.innerHTML = `
+          <div class="${sizeClass} rounded-full overflow-hidden flex items-center justify-center bg-slate-950 shadow-xl group-hover:scale-125 transition-transform duration-300" style="border: 2px solid ${coord.color};">
+            <img src="${activeImgSrc}" alt="${item.name.vietnamese}" class="w-full h-full object-cover select-none" onerror="this.onerror=null; this.src='https://placehold.co/100x100/0f172a/d97706?text=${encodeURIComponent(item.name.sanskrit.charAt(0))}';" />
+          </div>
+          <span class="mt-1 text-[10px] font-semibold text-slate-200 bg-black/75 px-1.5 py-0.5 rounded backdrop-blur border border-slate-800 opacity-80 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            ${item.name.vietnamese.split('(')[0].trim()}
+          </span>
+        `;
+
+        nodeEl.onmouseenter = () => highlightMandalaNode(item, coord);
+        nodeEl.onmouseleave = () => clearMandalaHighlight();
+        nodeEl.onclick = () => openModal(item);
+
+        container.appendChild(nodeEl);
+      });
+      applyCounterRotation();
+    }
+
+    function highlightMandalaNode(item, coord) {
+      updateInspector(item, coord);
+      const rayGroup = document.getElementById('rayGroup');
+      if (!rayGroup) return;
+      rayGroup.innerHTML = '';
+
+      if (!coord.parentId) return;
+      const parentCoord = MANDALA_COORDS[coord.parentId];
+      if (!parentCoord) return;
+
+      const rad1 = (coord.theta * Math.PI) / 180;
+      const x1 = coord.r * Math.cos(rad1);
+      const y1 = coord.r * Math.sin(rad1);
+
+      const rad2 = (parentCoord.theta * Math.PI) / 180;
+      const x2 = parentCoord.r * Math.cos(rad2);
+      const y2 = parentCoord.r * Math.sin(rad2);
+
+      const ray = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      ray.setAttribute('x1', x1);
+      ray.setAttribute('y1', y1);
+      ray.setAttribute('x2', x2);
+      ray.setAttribute('y2', y2);
+      ray.setAttribute('stroke', coord.color);
+      ray.setAttribute('stroke-width', '2.5');
+      ray.setAttribute('stroke-dasharray', '6 4');
+      ray.setAttribute('opacity', '0.9');
+
+      rayGroup.appendChild(ray);
+    }
+
+    function clearMandalaHighlight() {
+      const rayGroup = document.getElementById('rayGroup');
+      if (rayGroup) rayGroup.innerHTML = '';
+    }
+
+    function rotateDial(deg) {
+      currentRotation += deg;
+      const wheel = document.getElementById('mandalaWheel');
+      if (wheel) wheel.style.transform = `rotate(${currentRotation}deg)`;
+      applyCounterRotation();
+    }
+
+    function resetDial() {
+      currentRotation = 0;
+      const wheel = document.getElementById('mandalaWheel');
+      if (wheel) wheel.style.transform = `rotate(0deg)`;
+      applyCounterRotation();
+    }
+
+    function applyCounterRotation() {
+      document.querySelectorAll('#nodesContainer > div').forEach(nodeEl => {
+        nodeEl.style.transform = `translate(-50%, -50%) rotate(${-currentRotation}deg)`;
+      });
+    }
+
+    function updateInspector(item, coord) {
+      document.getElementById('inspName').innerText = item.name.vietnamese;
+      document.getElementById('inspMeta').innerText = `${item.name.sanskrit} • ${item.polarity}`;
+      document.getElementById('inspRole').innerText = `TẦNG ${coord.layer} (${coord.layer === 0 ? 'Bản Thể' : coord.layer === 1 ? 'Ngũ Trí' : coord.layer === 2 ? 'Đại Bồ Tát' : 'Hộ Pháp/Dakini'})`;
+      
+      const avatar = document.getElementById('inspAvatar');
+      const activeImgSrc = resolveImagePath(item);
+      avatar.innerHTML = `<img src="${activeImgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://placehold.co/100x100/0f172a/d97706?text=☸';" />`;
+      avatar.style.borderColor = coord.color;
+
+      const btn = document.getElementById('inspDetailBtn');
+      btn.classList.remove('hidden');
+      btn.onclick = () => openModal(item);
+    }
+
+    let activeModalItem = null;
+
+    function openModal(item) {
+      activeModalItem = item;
+      const modal = document.getElementById('detailModal');
+      const content = document.getElementById('modalContent');
+      currentTargetId = item.id;
+
+      const activeImgSrc = resolveImagePath(item);
+      const isDeity = item.system === 'deity';
+      const folderName = isDeity ? 'bo_ton/' : 'phapkhi/';
+
+      const partsHtml = item.symbolism.structural_breakdown.map(p => `
+        <li class="bg-slate-800/40 border border-slate-800 p-2.5 rounded-lg">
+          <span class="text-amber-400 font-semibold block sm:inline">${p.part}:</span> 
+          <span class="text-slate-300">${p.meaning}</span>
+        </li>
+      `).join('');
+
+      const deitiesHtml = item.associated_deities.map(d => `
+        <span class="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-3 py-1 rounded-full font-medium">
+          ${d}
+        </span>
+      `).join('');
+
+      content.innerHTML = `
+        <div class="flex flex-col md:flex-row gap-6 mb-6 items-center md:items-start">
+          <div class="w-full md:w-5/12 flex flex-col items-center">
+            <div class="w-full h-64 sm:h-72 bg-slate-950 rounded-xl overflow-hidden border border-amber-500/30 shadow-inner flex items-center justify-center p-3 relative group">
+              <img 
+                id="modalImageDisplay"
+                src="${activeImgSrc}" 
+                alt="${item.name.vietnamese}" 
+                class="w-full h-full object-contain cursor-zoom-in hover:scale-105 transition-transform duration-300"
+                title="Nhấp vào để phóng to toàn màn hình"
+                onclick="triggerZoomFromModal()"
+                onerror="this.onerror=null; this.src='https://placehold.co/600x600/0f172a/d97706?text=${encodeURIComponent(item.name.sanskrit)}';"
+              />
+              <span class="absolute top-2 left-2 bg-black/75 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                🔍 Bấm để phóng to
+              </span>
+            </div>
+            <button 
+              onclick="document.getElementById('singleFileInput').click()" 
+              class="mt-3 w-full py-2 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5"
+            >
+              📁 Chọn / Thay ảnh từ máy tính
+            </button>
+          </div>
+
+          <div class="w-full md:w-7/12">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-semibold px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md">
+                ${item.name.tibetan}
+              </span>
+              <span class="text-xs text-slate-400 uppercase tracking-wide">
+                • ${isDeity ? 'Tôn Tượng Bổn Tôn' : 'Pháp Khí Mật Tông'}
+              </span>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-bold text-amber-400 mt-1 mb-1">${item.name.vietnamese}</h2>
+            <p class="text-sm text-slate-400 italic mb-4">${item.name.sanskrit}</p>
+
+            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+              <div><span class="text-slate-500">Cực tính / Bản chất:</span> <p class="text-slate-200 font-medium">${item.polarity}</p></div>
+              <div><span class="text-slate-500">Thuộc tính / Chất liệu:</span> <p class="text-slate-200 font-medium">${item.element}</p></div>
+              <div class="col-span-2 mt-1"><span class="text-slate-500">Đường dẫn tệp mặc định:</span> <p class="text-amber-300 font-mono">${folderName}${item.id}.jpg</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-5 text-sm">
+          <div>
+            <h3 class="text-amber-400 font-semibold text-base mb-1.5 flex items-center gap-1.5">
+              <span>✦</span> Mật Nghĩa Biểu Tượng Cốt Tủy
+            </h3>
+            <p class="text-slate-300 leading-relaxed bg-slate-950/30 p-3.5 rounded-xl border border-slate-800/80">
+              ${item.symbolism.core_meaning}
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-amber-400 font-semibold text-base mb-2 flex items-center gap-1.5">
+              <span>✦</span> Cấu Trúc Biểu Tượng & Đồ Tượng Học
+            </h3>
+            <ul class="space-y-2 text-xs sm:text-sm">${partsHtml}</ul>
+          </div>
+
+          <div class="bg-amber-950/20 border border-amber-500/20 rounded-xl p-4">
+            <h3 class="text-amber-400 font-semibold text-base mb-2 flex items-center gap-1.5">
+              <span>✦</span> Quy Cách Trì Giữ & Ứng Dụng Nghi Quỹ
+            </h3>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <p><strong class="text-amber-200">Thủ ấn / Vị trí trì giữ:</strong> ${item.ritual_usage.mudra || item.ritual_usage.holding_hand}</p>
+              <p><strong class="text-amber-200">Ứng dụng đàn tràng / Hành trì:</strong> ${item.ritual_usage.practical_application}</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-amber-400 font-semibold text-sm mb-2 flex items-center gap-1.5">
+              <span>✦</span> Bổn Tôn & Bậc Truyền Thừa Liên Quan
+            </h3>
+            <div class="flex flex-wrap gap-2">${deitiesHtml}</div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function triggerZoomFromModal() {
+      if (activeModalItem) {
+        const activeImgSrc = resolveImagePath(activeModalItem);
+        openZoomModal(activeImgSrc);
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('detailModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      document.body.style.overflow = '';
+    }
+
+    function openZoomModal(imgSrc) {
+      const zoomModal = document.getElementById('imageZoomModal');
+      const zoomedImg = document.getElementById('zoomedImageDisplay');
+      if (zoomModal && zoomedImg) {
+        zoomedImg.src = imgSrc;
+        zoomModal.classList.remove('hidden');
+        zoomModal.classList.add('flex');
+      }
+    }
+
+    function closeZoomModal() {
+      const zoomModal = document.getElementById('imageZoomModal');
+      if (zoomModal) {
+        zoomModal.classList.add('hidden');
+        zoomModal.classList.remove('flex');
+      }
+    }
+
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+      const evt = e || window.event;
+      if (evt.target.id === 'detailModal') closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const evt = e || window.event;
+      if (evt.key === 'Escape') {
+        closeZoomModal();
+        closeModal();
+      }
+    });
+
+    // KHỞI CHẠY BẢO ĐẢM 100%
+    window.addEventListener('DOMContentLoaded', () => {
+      const searchBox = document.getElementById('searchInput');
+      if (searchBox) {
+        searchBox.addEventListener('input', () => {
+          if (currentViewMode === 'grid') filterData();
+          else renderMandalaNodes();
+        });
+      }
+      
+      renderCategoryTabs();
+      filterData();
+      loadAllSavedImages();
+    });
+  </script>
+</body>
+</html>
