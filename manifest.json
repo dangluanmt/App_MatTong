@@ -1,0 +1,21 @@
+{
+  "name": "Bách Khoa Toàn Thư Mật Tông",
+  "short_name": "Mật Tông",
+  "description": "Kho tàng 133 Tôn Tượng & Pháp Khí Kim Cương Thừa",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#080c14",
+  "theme_color": "#080c14",
+  "icons": [
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Dorje_symbol.jpg/192px-Dorje_symbol.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Dorje_symbol.jpg/512px-Dorje_symbol.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
