@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<link rel="manifest" href="./manifest.json">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bách Khoa Toàn Thư Mật Tông - 133 Pháp Khí & Bổn Tôn</title>
@@ -19,6 +18,16 @@
     .node-transition { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
     .bija-glow { text-shadow: 0 0 12px rgba(245, 158, 11, 0.8), 0 0 24px rgba(245, 158, 11, 0.4); }
   </style>
+  <script>
+    // Cấu hình chế độ chia sẻ (true = ẩn toàn bộ nút quản trị/nạp ảnh khi xuất APK)
+    const IS_SHARE_MODE = true;
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+      });
+    }
+  </script>
 </head>
 <body class="min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-950/25 via-[#0a0f1d] to-[#050811]">
 
@@ -26,15 +35,12 @@
   <header class="border-b border-amber-500/20 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-3">
       
-      <!-- Tiêu Đề 2 Dòng Canh Giữa -->
+      <!-- Tiêu Đề -->
       <div class="w-full md:w-auto text-center mx-auto md:mx-0">
-        <div class="flex flex-col items-center justify-center">
-          <span class="text-amber-400/90 text-xs font-semibold tracking-widest uppercase mb-0.5">MẬT TÔNG</span>
-          <div class="flex items-center justify-center gap-2">
-            <span class="text-amber-400 text-xl">☸</span>
-            <h1 class="font-cinzel text-base sm:text-lg font-bold tracking-wider text-amber-300">KIM CƯƠNG THỪA</h1>
-            <span class="text-amber-400 text-xl">☸</span>
-          </div>
+        <div class="flex items-center justify-center gap-2">
+          <span class="text-amber-400 text-lg">☸</span>
+          <h1 class="font-cinzel text-sm sm:text-base font-bold tracking-wider text-amber-300 uppercase">MẬT TÔNG - KIM CƯƠNG THỪA</h1>
+          <span class="text-amber-400 text-lg">☸</span>
         </div>
       </div>
 
@@ -55,24 +61,19 @@
           <button onclick="setSystem('deity')" id="sys-deity" class="sys-btn px-2.5 py-1 text-xs rounded-lg font-semibold text-slate-300 hover:text-white transition">Tôn Tượng</button>
         </div>
 
-        <button onclick="exportBackupData()" class="text-xs font-semibold px-2.5 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl transition shadow">
-          💾 Sao Lưu
-        </button>
-
-        <button onclick="document.getElementById('backupFileInput').click()" class="text-xs font-semibold px-2.5 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 rounded-xl transition shadow">
-          📥 Nạp Lại
-        </button>
+        <!-- CÁC NÚT QUẢN TRỊ (Chỉ hiện khi IS_SHARE_MODE = false) -->
+        <script>
+          if (!IS_SHARE_MODE) {
+            document.write(`
+              <button onclick="exportBackupData()" class="text-xs font-semibold px-2.5 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl transition shadow">💾 Sao Lưu</button>
+              <button onclick="document.getElementById('backupFileInput').click()" class="text-xs font-semibold px-2.5 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 rounded-xl transition shadow">📥 Nạp Lại</button>
+              <button onclick="document.getElementById('batchFileInput').click()" class="text-xs font-semibold px-2.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl transition shadow">📁 Nạp Loạt Ảnh</button>
+              <button onclick="document.getElementById('batchMudraInput').click()" class="text-xs font-semibold px-2.5 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 rounded-xl transition shadow">🤲 Nạp Tất Cả Ấn</button>
+            `);
+          }
+        </script>
         <input type="file" id="backupFileInput" accept=".json" class="hidden" onchange="importBackupData(event)" />
-
-        <button onclick="document.getElementById('batchFileInput').click()" class="text-xs font-semibold px-2.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl transition shadow">
-          📁 Nạp Loạt Ảnh
-        </button>
         <input type="file" id="batchFileInput" multiple accept="image/*" class="hidden" onchange="handleBatchUpload(event)" />
-
-        <!-- NÚT NẠP TẤT CẢ ẢNH THỦ ẤN -->
-        <button onclick="document.getElementById('batchMudraInput').click()" class="text-xs font-semibold px-2.5 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 rounded-xl transition shadow" title="Chọn nhiều file ảnh thủ ấn để nạp hàng loạt">
-          🤲 Nạp Tất Cả Ấn
-        </button>
         <input type="file" id="batchMudraInput" multiple accept="image/*" class="hidden" onchange="handleBatchMudraUpload(event)" />
 
         <div class="relative flex-1 md:w-48">
@@ -136,7 +137,6 @@
     </div>
   </main>
 
-  <!-- Input nạp ảnh ẩn -->
   <input type="file" id="singleFileInput" accept="image/*" class="hidden" onchange="handleSingleUpload(event)" />
   <input type="file" id="mudraFileInput" accept="image/*" class="hidden" onchange="handleMudraUpload(event)" />
 
@@ -165,9 +165,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. DỮ LIỆU CỐT LÕI (58 PHÁP KHÍ + 75 BỔN TÔN = 133 MỤC)
-    // ==========================================
     const VAJRAYANA_MASTER_DATA = [
       // 58 PHÁP KHÍ
       {"id":"vajra","system":"phap_khi","name":{"vietnamese":"Kim Cang Chùy (Chày Kim Cương)","sanskrit":"Vajra","tibetan":"Dorje"},"category_id":"core","polarity":"Dương (Phương tiện)","element":"Kim / Sắt thiên thạch","classification":"Tức, Tăng, Hoài, Tru","symbolism":{"core_meaning":"Bản tánh kim cương bất hoại của Bồ Đề tâm, đập tan mọi tà kiến vô minh."},"associated_deities":["deity_vajrasattva","deity_vajrapani","deity_padmasambhava","deity_vajradhara"]},
@@ -229,7 +226,7 @@
       {"id":"chhatra_emblem","system":"phap_khi","name":{"vietnamese":"Lọng Báu Che Chở","sanskrit":"Chhatra","tibetan":"Duk"},"category_id":"protection","polarity":"Che chở nhiệt não","element":"Kim loại mạ vàng chạm khắc","classification":"Bát Cát Tường","symbolism":{"core_meaning":"Bảo bọc muôn loài khỏi lửa thiêu phiền não nghiệp chướng."},"associated_deities":["deity_sitatapatra"]},
       {"id":"serkym_set","system":"phap_khi","name":{"vietnamese":"Bộ Chén Dâng Trà Vàng Serkym","sanskrit":"Serkym","tibetan":"Serkym"},"category_id":"offering","polarity":"Cúng dường khẩn cấp","element":"Chén đĩa đồng chạm bạc","classification":"Nghi lễ Hộ Pháp","symbolism":{"core_meaning":"Biến chất lỏng thành cam lồ đại lạc dâng Hộ Pháp hộ trì."},"associated_deities":["deity_mahakala","deity_dorje_shugden"]},
 
-      // 75 TÔN TƯỢNG BỔN TÔN (CHUẨN TRÒN 75 VỊ)
+      // 75 TÔN TƯỢNG BỔN TÔN
       {"id":"deity_shakyamuni","system":"deity","name":{"vietnamese":"Đức Bổn Sư Thích Ca Mâu Ni","sanskrit":"Śākyamuni Buddha","tibetan":"Thubpa"},"category_id":"buddha_adibuddha","polarity":"Cực Trọng Giáo Chủ","element":"Hoàng kim quang minh","classification":"Giáo Chủ Sa Bà","bija":"BHŪḤ","mantra_sanskrit":"Oṃ Muni Muni Mahāmuni Śākyamunaye Svāhā","mantra_vi":"Ôm Mu-ni Mu-ni Ma-ha Mu-ni Sa-kya-mu-na-yê Xô-ha","audio_url":"audio/mantra_shakyamuni.mp3","mudra":{"name":"Xúc Địa Hàng Ma Ấn (Bhūmisparśa Mudrā)","gesture":"Tay phải buông dọc gối phải chạm mặt đất làm chứng hàng phục ma quân; tay trái ngửa trong lòng đùi nâng bình bát khất thực","meaning":"Mặt đất làm chứng vạn kiếp công đức viên mãn, đập tan mọi ảo vọng ma quân vô minh"},"symbolism":{"core_meaning":"Bậc Đạo sư giác ngộ cội nguồn của toàn bộ Phật pháp thế giới Sa Bà."},"associated_deities":["dharmachakra","ashtamangala_emblems"]},
       {"id":"deity_vajradhara","system":"deity","name":{"vietnamese":"Đức Kim Cang Trì","sanskrit":"Vajradhara","tibetan":"Dorje Chang"},"category_id":"buddha_adibuddha","polarity":"Bất Nhị","element":"Lam ngọc quang","classification":"Bản Sơ Phật","bija":"HŪṂ","mantra_sanskrit":"Oṃ Vajradhara Hūṃ Hūṃ","mantra_vi":"Ôm Va-dza-ra-đa-ra Hum Hum","audio_url":"audio/mantra_vajradhara.mp3","mudra":{"name":"Kim Cang Hợp Hưởng Ấn (Vajrahūṃkāra Mudrā)","gesture":"Hai cổ tay bắt chéo trước ngực, tay phải ngoài tay trái trong, tay phải cầm chày Kim Cang, tay trái cầm chuông","meaning":"Hợp nhất tuyệt đối Bất Nhị giữa Trí tuệ Tánh Không và Phương tiện Từ bi"},"symbolism":{"core_meaning":"Hiện thân tối cao của Pháp thân và Báo thân, cội nguồn xuất sinh Mạn-đà-la."},"associated_deities":["vajra","ghanta"]},
       {"id":"deity_samantabhadra","system":"deity","name":{"vietnamese":"Đức Phổ Hiền Như Lai","sanskrit":"Samantabhadra","tibetan":"Kuntuzangpo"},"category_id":"buddha_adibuddha","polarity":"Bản lai thanh tịnh","element":"Hư không tuyệt đối","classification":"Pháp Thân Cổ Mật","bija":"ĀḤ","mantra_sanskrit":"Oṃ Dharmadhātu Āḥ","mantra_vi":"Ôm Đạt-ma-đa-tu A","audio_url":"audio/mantra_samantabhadra.mp3","mudra":{"name":"Pháp Giới Định Ấn (Dhyāna / Samāhita Mudrā)","gesture":"Hai tay đặt ngửa chồng lên nhau nơi đan điền, hai ngón cái chạm nhẹ","meaning":"Trụ vững trong thực tại Bản lai thanh tịnh vô vi của Pháp giới"},"symbolism":{"core_meaning":"Giác ngộ nguyên thủy vốn thanh tịnh từ vô thủy, vượt khỏi mọi ý niệm."},"associated_deities":["mandala_plate"]},
@@ -265,7 +262,7 @@
       {"id":"deity_ksitigarbha","system":"deity","name":{"vietnamese":"Đức Địa Tạng Vương","sanskrit":"Ksitigarbha","tibetan":"Sa'i Nyingpo"},"category_id":"bodhisattva","polarity":"Đại Nguyện kiên cố","element":"Hoàng thổ đại địa","classification":"Bát Đại Bồ Tát","bija":"HA","mantra_sanskrit":"Oṃ Ha Ha Ha Vismaye Svāhā","mantra_vi":"Ôm Ha Ha Ha Vít-xma-yê Xô-ha","audio_url":"audio/mantra_ksitigarbha.mp3","mudra":{"name":"Chấn Khai Địa Ngục Ấn / Bảo Châu Ấn (Cintāmaṇi Mudrā)","gesture":"Tay phải cầm tích trượng rung động; tay trái nâng như ý bảo châu chiếu sáng u minh","meaning":"Đại Nguyện kiên cố phá vỡ cửa ngục u ám, cứu vớt chúng sinh cõi tối"},"symbolism":{"core_meaning":"Nguyện lực vững chắc như đất dày dung chứa muôn vật."},"associated_deities":["khakkhara"]},
       {"id":"deity_maitreya","system":"deity","name":{"vietnamese":"Đức Di Lặc Bồ Tát","sanskrit":"Maitreya","tibetan":"Jampa"},"category_id":"bodhisattva","polarity":"Từ bi hoan hỷ","element":"Hoàng kim sáng rỡ","classification":"Phật Tương Lai","bija":"MAIṂ","mantra_sanskrit":"Oṃ Maitreya Svāhā","mantra_vi":"Ôm Mai-trê-ya Xô-ha","audio_url":"audio/mantra_maitreya.mp3","mudra":{"name":"Thuyết Pháp Ấn (Dharmacakra-Pravartana Mudrā)","gesture":"Hai tay đặt trước ngực kết ấn Chuyển Pháp Luân, hai bên nâng hoa sen","meaning":"Tuyên thuyết Chánh pháp thời tương lai, tình thương yêu vô điều kiện"},"symbolism":{"core_meaning":"Hiện thân cho tình thương thuần khiết mở ra kỷ nguyên hòa bình."},"associated_deities":["dharmachakra"]},
       {"id":"deity_green_tara","system":"deity","name":{"vietnamese":"Đức Lục Độ Mẫu","sanskrit":"Syamatara","tibetan":"Drolma Jangkhu"},"category_id":"bodhisattva","polarity":"Cứu khổ tức thì","element":"Lục ngọc sinh khí","classification":"Mẹ Cứu Độ","bija":"TĀṂ","mantra_sanskrit":"Oṃ Tāre Tuttāre Ture Svāhā","mantra_vi":"Ôm Ta-rê Tu-ta-rê Tu-rê Xô-ha","audio_url":"audio/mantra_green_tara.mp3","mudra":{"name":"Ấn Thí Nguyện & Ấn Tam Bảo (Varada & Triratna Mudrā)","gesture":"Tay phải ngửa buông trên gối ban phước; tay trái giữ cành hoa sen xanh Utpala","meaning":"Cứu độ tức thì khỏi tám nỗi sợ hãi nguy cấp"},"symbolism":{"core_meaning":"Năng lượng cứu độ nhanh chóng của chư Phật; che chở muôn cõi."},"associated_deities":["lungta","vishvavajra"]},
-      {"id":"deity_saraswati","system":"deity","name":{"vietnamese":"Diệu Âm Thiên Nữ","sanskrit":"Sarasvati","tibetan":"Yangchenma"},"category_id":"bodhisattva","polarity":"Biện tài âm nhạc","element":"Âm ba thanh lương","classification":"Phật Mẫu Trí Tuệ","bija":"HRĪḤ","mantra_sanskrit":"Oṃ Sarasvatyai Svāhā","mantra_vi":"Ôm Sa-rát-xva-tyai Xô-ha","audio_url":"audio/mantra_saraswati.mp3","mudra":{"name":"Cầm Đàn Veena Ấn (Vīṇā-Vādana Mudrā)","gesture":"Hai tay nâng gảy cây đàn tỳ bà Veena bằng ngọc lưu ly","meaning":"Diệu âm vũ trụ thức tỉnh tâm trí, biện tài văn thơ và âm nhạc"},"symbolism":{"core_meaning":"Ban phát sự thông tuệ ngôn ngữ, tài hùng biện và âm nhạc."},"associated_deities":["ghanta"]},
+      {"id":"deity_saraswati","system":"deity","name":{"vietnamese":"Diệu Âm Thiên Nữ","sanskrit":"Sarasvati","tibetan":"Yangchenma"},"category_id":"bodhisattva","polarity":"Biện tài âm nhạc","element":"Âm ba thanh lương","classification":"Phật Mẫu Trí Tuệ","bija":"HRĪḤ","mantra_sanskrit":"Oṃ Sarasvatyai Svāhā","mantra_vi":"Ôm Sa-rat-xva-tyai Xô-ha","audio_url":"audio/mantra_saraswati.mp3","mudra":{"name":"Cầm Đàn Veena Ấn (Vīṇā-Vādana Mudrā)","gesture":"Hai tay nâng gảy cây đàn tỳ bà Veena bằng ngọc lưu ly","meaning":"Diệu âm vũ trụ thức tỉnh tâm trí, biện tài văn thơ và âm nhạc"},"symbolism":{"core_meaning":"Ban phát sự thông tuệ ngôn ngữ, tài hùng biện và âm nhạc."},"associated_deities":["ghanta"]},
       {"id":"deity_padmasambhava","system":"deity","name":{"vietnamese":"Đạo Sư Liên Hoa Sinh","sanskrit":"Padmasambhava","tibetan":"Guru Rinpoche"},"category_id":"guru","polarity":"Điều phục Tam Giới","element":"Hóa sinh hoa sen","classification":"Khai sơn Mật Tông","bija":"HRĪḤ","mantra_sanskrit":"Oṃ Āḥ Hūṃ Vajra Guru Padma Siddhi Hūṃ","mantra_vi":"Ôm A Hum Va-dza-ra Gu-ru Pát-mê Sít-đi Hum","audio_url":"audio/mantra_padmasambhava.mp3","mudra":{"name":"Liên Hoa Đạo Sư Ấn (Guru-Padma Mudrā)","gesture":"Tay phải cầm chày Kim Cang dựng đứng; tay trái nâng chén sọ Kapala, vai tựa trượng Khatvanga","meaning":"Bậc Đạo Sư vĩ đại điều phục quỷ thần, ban truyền Mật pháp tối thượng"},"symbolism":{"core_meaning":"Đấng điều phục quỷ thần, truyền trao giáo pháp Mật thừa cõi Tuyết."},"associated_deities":["vajra","khatvanga","damaru"]},
       {"id":"deity_machig_labdron","system":"deity","name":{"vietnamese":"Tổ Mẫu Machig Labdrön","sanskrit":"Machig Labdron","tibetan":"Machig Labdron"},"category_id":"guru","polarity":"Cắt đứt chấp ngã","element":"Bạch cốt không quán","classification":"Sơ tổ dòng Chöd","bija":"PHAT","mantra_sanskrit":"Oṃ Gate Gate Pāragate Pārasaṃgate Bodhi Svāhā Phaṭ","mantra_vi":"Ôm Ga-tê Ga-tê Pa-ra-ga-tê Pa-ra-xam-ga-tê Bô-đi Xô-ha Phạt","audio_url":"audio/mantra_machig_labdron.mp3","mudra":{"name":"Đoạn Ngã Khiêu Vũ Ấn (Chöd-Damaru Mudrā)","gesture":"Đứng khiêu vũ chân co, tay phải lắc trống Damaru lớn, tay trái cầm chuông","meaning":"Cắt đứt chấp ngã qua nghi quỹ xả thân cúng dường Chöd"},"symbolism":{"core_meaning":"Xả thân nuôi dưỡng muôn loài, cắt tận ngọn nguồn bản ngã."},"associated_deities":["damaru","kangling"]},
       {"id":"deity_vajrayogini","system":"deity","name":{"vietnamese":"Kim Cang Du Già Mẫu","sanskrit":"Vajrayogini","tibetan":"Dorje Naljorma"},"category_id":"dakini","polarity":"Đại Lạc Tánh Không","element":"Hỏa xích rực lửa","classification":"Nữ Bổn Tôn Tối Thượng","bija":"VAṂ","mantra_sanskrit":"Oṃ Oṃ Oṃ Sarva Buddha Ḍākinīye Hūṃ Phaṭ Svāhā","mantra_vi":"Ôm Ôm Ôm Sác-va Bút-đa Đa-ki-ni-yê Hum Phạt Xô-ha","audio_url":"audio/mantra_vajrayogini.mp3","mudra":{"name":"Không Hành Khiêu Vũ Trì Trượng Ấn (Ḍākinī Nṛtya Mudrā)","gesture":"Tay phải vung dao Kartika; tay trái giơ cao bát sọ Kapala, vai tựa trượng Khatvanga","meaning":"Chuyển hóa ái dục thành trí giác đại lạc vô lậu"},"symbolism":{"core_meaning":"Trực giác giác ngộ tối hậu; chuyển ái dục thành đại lạc Tánh Không."},"associated_deities":["kartika","kapala","sindhura_box"]},
@@ -292,11 +289,11 @@
       {"id":"deity_vishvamata","system":"deity","name":{"vietnamese":"Biến Nhất Thiết Mẫu","sanskrit":"Vishvamata","tibetan":"Natshok Yum"},"category_id":"dakini","polarity":"Không gian thời gian","element":"Hoàng kim quang","classification":"Phối ngẫu Kalachakra","bija":"PHAT","mantra_sanskrit":"Oṃ Viśvamātā Hūṃ Phaṭ","mantra_vi":"Ôm Vít-xva-ma-ta Hum Phạt","audio_url":"audio/mantra_vishvamata.mp3","mudra":{"name":"Thời Luân Dung Thông Ấn (Kālacakra-Viśva Mudrā)","gesture":"Tám cánh tay ôm Kalachakra, tay cầm Kartika, Kapala và bánh xe","meaning":"Bản thể Không gian bao la dung chứa toàn bộ hiện tượng thời gian"},"symbolism":{"core_meaning":"Bản thể Không gian bao la dung nạp toàn bộ thời gian vũ trụ."},"associated_deities":["kartika","kapala"]},
       {"id":"deity_vajravidarana","system":"deity","name":{"vietnamese":"Đức Tồi Toái Kim Cang","sanskrit":"Vajravidarana","tibetan":"Dorje Namjom"},"category_id":"buddha_purification","polarity":"Sái tịnh phá uế","element":"Lục ngọc quang","classification":"Trừ tà tẩy tịnh","bija":"HŪṂ","mantra_sanskrit":"Oṃ Vajravidāraṇa Hūṃ Phaṭ","mantra_vi":"Ôm Va-dza-ra-vi-đa-ra-na Hum Phạt","audio_url":"audio/mantra_vajravidarana.mp3","mudra":{"name":"Tồi Toái Hàng Ma Ấn (Vajravidāraṇa Mudrā)","gesture":"Tay phải nâng Yết Ma Chùy ngang ngực, tay trái cầm chuông lắc sái tịnh ngang hông","meaning":"Đập tan uế trược, tà thuật ma quỷ và phục hồi sinh lực suy vi"},"symbolism":{"core_meaning":"Pháp môn sái tịnh tối thượng tẩy trừ uế trược phục hồi sinh lực."},"associated_deities":["vishvavajra","ghanta"]},
       {"id":"deity_prajnaparamita","system":"deity","name":{"vietnamese":"Bát Nhã Phật Mẫu (Đại Mẫu)","sanskrit":"Prajnaparamita","tibetan":"Yum Chenmo"},"category_id":"buddha_adibuddha","polarity":"Mẹ của Chư Phật","element":"Vàng kim Bát-nhã","classification":"Kinh Bát Nhã","bija":"DHĪḤ","mantra_sanskrit":"Gate Gate Pāragate Pārasaṃgate Bodhi Svāhā","mantra_vi":"Ga-tê Ga-tê Pa-ra-ga-tê Pa-ra-xam-ga-tê Bô-đi Xô-ha","audio_url":"audio/mantra_prajnaparamita.mp3","mudra":{"name":"Bát Nhã Ba La Mật Định Ấn (Prajñāpāramitā Dhyāna Mudrā)","gesture":"Hai tay chính đặt thiền định; hai tay phụ giơ cao cầm chùy vàng và kinh Bát Nhã","meaning":"Bản thể Mẹ hiền sinh ra chư Phật, trí tuệ Tánh Không rốt ráo"},"symbolism":{"core_meaning":"Trí tuệ Tánh Không cội nguồn xuất sinh mọi quả vị Phật."},"associated_deities":["pecha_covers","vajra"]},
-      {"id":"deity_ushnisha_sitatapatra_peaceful","system":"deity","name":{"vietnamese":"Bạch Tán Cái (Tịch Tĩnh)","sanskrit":"Sitatapatra (Peaceful)","tibetan":"Dukkar Zhiwa"},"category_id":"dakini","polarity":"Bảo hộ an lành","element":"Bạch ngọc","classification":"Báo thân tịch tĩnh","bija":"SI","mantra_sanskrit":"Oṃ Sitātapatre Hūṃ Phaṭ","mantra_vi":"Ôm Si-ta-ta-pa-trê Hum Phạt","audio_url":"audio/mantra_sitatapatra_peaceful.mp3","mudra":{"name":"Bình An Thí Nguyện Ấn (Śānti-Varada Mudrā)","gesture":"Ngồi kiết già, tay phải bắt ấn Thí Nguyện, tay trái nâng cuống lọng trắng tơ lụa","meaning":"Bảo hộ gia đạo bình an, giải trừ tai ách cho con trẻ"},"symbolism":{"core_meaning":"Chiếc lọng trắng che chở bình an gia đạo tiêu tai giải hạn."},"associated_deities":["chhatra_emblem"]},
+      {"id":"deity_ushnisha_sitatapatra_peaceful","system":"deity","name":{"vietnamese":"Bạch Tán Cái (Tịch Tĩnh)","sanskrit":"Sitatapatra (Peaceful)","tibetan":"Dukkar Zhiwa"},"category_id":"dakini","polarity":"Bảo hộ an lành","element":"Bạch ngọc","classification":"Báo thân tịch tĩnh","bija":"SI","mantra_sanskrit":"Oṃ Sitātapatre Hūṃ Phaṭ","mantra_vi":"Ôm Si-ta-ta-pa-trê Hum Phạt","audio_url":"audio/mantra_ushnisha_sitatapatra_peaceful.mp3","mudra":{"name":"Bình An Thí Nguyện Ấn (Śānti-Varada Mudrā)","gesture":"Ngồi kiết già, tay phải bắt ấn Thí Nguyện, tay trái nâng cuống lọng trắng tơ lụa","meaning":"Bảo hộ gia đạo bình an, giải trừ tai ách cho con trẻ"},"symbolism":{"core_meaning":"Chiếc lọng trắng che chở bình an gia đạo tiêu tai giải hạn."},"associated_deities":["chhatra_emblem"]},
       {"id":"deity_guhyajnana_dakini","system":"deity","name":{"vietnamese":"Bí Mật Nhã Dakini","sanskrit":"Guhyajnana","tibetan":"Sangwa Yeshe"},"category_id":"dakini","polarity":"Mật truyền Bổn Sư","element":"Hỏa xích quang","classification":"Dakini của Guru Rinpoche","bija":"HRĪḤ","mantra_sanskrit":"Oṃ Jñāna Ḍākinī Hrīḥ Hūṃ Phaṭ Svāhā","mantra_vi":"Ôm Dzyan-na Đa-ki-ni Hri Hum Phạt Xô-ha","audio_url":"audio/mantra_guhyajnana_dakini.mp3","mudra":{"name":"Bí Mật Khai Ngộ Ấn (Guhya-Prajñā Mudrā)","gesture":"Tay phải vung dao Kartika ngang tim; tay trái giơ cao bát sọ Kapala, chân đứng du-già","meaning":"Mật truyền khai mở Phật tánh trực tiếp cho Đạo sư Liên Hoa Sinh"},"symbolism":{"core_meaning":"Vị Nữ Bổn Tôn trao mật pháp khai ngộ cho Đạo sư Liên Hoa Sinh."},"associated_deities":["kartika","kapala"]},
-      {"id":"deity_tara_eight_fears","system":"deity","name":{"vietnamese":"Tārā Cứu Bát Nạn","sanskrit":"Ashtabhaya-tara","tibetan":"Drolma Jikpa Gyegyop"},"category_id":"bodhisattva","polarity":"Cứu nạn tức thời","element":"Lục sắc linh ứng","classification":"21 Độ Mẫu","bija":"TĀṂ","mantra_sanskrit":"Oṃ Tāre Tuttāre Ture Sarva Bhaya Vimocana Svāhā","mantra_vi":"Ôm Ta-rê Tu-ta-rê Tu-rê Sác-va Bha-da Vi-mô-cha-na Xô-ha","audio_url":"audio/mantra_tara_eight_fears.mp3","mudra":{"name":"Cứu Khổ Thí Vô Úy Ấn (Bhaya-Vimocana Mudrā)","gesture":"Tay phải giơ cao hướng ngoại che chở; tay trái cầm cành sen nở bung 8 nhánh","meaning":"Cứu độ nạn lửa, nước, sư tử, voi, đao binh, quỷ dữ, rắn độc, tù tội"},"symbolism":{"core_meaning":"Cứu độ tức thì khỏi tám nỗi sợ lớn trong đời sống."},"associated_deities":["green_tara"]},
+      {"id":"deity_tara_eight_fears","system":"deity","name":{"vietnamese":"Tārā Cứu Bát Nạn","sanskrit":"Ashtabhaya-tara","tibetan":"Drolma Jikpa Gyegyop"},"category_id":"bodhisattva","polarity":"Cứu nạn tức thì","element":"Lục sắc linh ứng","classification":"21 Độ Mẫu","bija":"TĀṂ","mantra_sanskrit":"Oṃ Tāre Tuttāre Ture Sarva Bhaya Vimocana Svāhā","mantra_vi":"Ôm Ta-rê Tu-ta-rê Tu-rê Sác-va Bha-da Vi-mô-cha-na Xô-ha","audio_url":"audio/mantra_tara_eight_fears.mp3","mudra":{"name":"Cứu Khổ Thí Vô Úy Ấn (Bhaya-Vimocana Mudrā)","gesture":"Tay phải giơ cao hướng ngoại che chở; tay trái cầm cành sen nở bung 8 nhánh","meaning":"Cứu độ tức thì khỏi tám nỗi sợ hãi nguy cấp"},"symbolism":{"core_meaning":"Cứu độ tức thì khỏi tám nỗi sợ lớn trong đời sống."},"associated_deities":["green_tara"]},
       {"id":"deity_pehar_gyalpo","system":"deity","name":{"vietnamese":"Bạch Cáp Hộ Pháp (Pehar)","sanskrit":"Pehar Gyalpo","tibetan":"Pehar Gyalpo"},"category_id":"dharmapala","polarity":"Trấn giữ Chánh pháp","element":"Bạch phong bão táp","classification":"Hộ Pháp Samye","bija":"TRI","mantra_sanskrit":"Oṃ Pehar Gyalpo Hūṃ Phaṭ","mantra_vi":"Ôm Pê-ha Gy-an-pô Hum Phạt","audio_url":"audio/mantra_pehar_gyalpo.mp3","mudra":{"name":"Vương Quyền Trấn Giữ Ấn (Rājadharma Mudrā)","gesture":"Đội mũ rộng vành cưỡi sư tử tuyết, tay giương cung tên, tay cầm gươm và gậy","meaning":"Thần bảo hộ tu viện Samye và kho tàng Phật pháp xứ Tuyết"},"symbolism":{"core_meaning":"Thần bảo hộ tu viện Samye do Guru Rinpoche đích thân hàng phục."},"associated_deities":["serkym_set"]},
-      {"id":"deity_begtse_chen","system":"deity","name":{"vietnamese":"Đại Giáp Hộ Pháp","sanskrit":"Begtse Chen","tibetan":"Begtse Chen"},"category_id":"dharmapala","polarity":"Chiến binh phẫn nộ","element":"Xích đồng hỏa diệm","classification":"Hộ Pháp Giáp Đỏ","bija":"TRO","mantra_sanskrit":"Oṃ Begtse Chen Hūṃ Phaṭ","mantra_vi":"Ôm Béc-sê Chen Hum Phạt","audio_url":"audio/mantra_begtse_chen.mp3","mudra":{"name":"Xích Y Chiến Trận Ấn (Kavaca-Krodha Mudrā)","gesture":"Mặc giáp đồng đỏ cưỡi ngựa, tay phải vung kiếm chuôi bò cạp; tay trái ngậm quả tim","meaning":"Bảo vệ hành giả khỏi hỏa hoạn, chiến tranh và các hung sát tà đạo"},"symbolism":{"core_meaning":"Mặc giáp đồng đỏ bảo vệ người tu khỏi chiến tranh và hung sát."},"associated_deities":["serkym_set","khadga"]},
+      {"id":"deity_begtse_chen","system":"deity","name":{"vietnamese":"Đại Giáp Hộ Pháp","sanskrit":"Begtse Chen","tibetan":"Begtse Chen"},"category_id":"dharmapala","polarity":"Chiến binh phẫn nộ","element":"Xích đồng hỏa diệm","classification":"Hộ Pháp Giáp Đỏ","bija":"TRO","mantra_sanskrit":"Oṃ Begtse Chen Hūṃ Phaṭ","mantra_vi":"Ôm Béc-sê Chen Hum Phạt","audio_url":"audio/mantra_begtse_chen.mp3","mudra":{"name":"Xích Y Chiến Trận Ấn (Kavaca-Krodha Mudrā)","gesture":"Mặc giáp đồng đỏ cưỡi ngựa, tay phải vung kiếm chuôi bò cạp; tay trái ngậm quả tim","meaning":"Bảo hộ hành giả khỏi hỏa hoạn, chiến tranh và các hung sát tà đạo"},"symbolism":{"core_meaning":"Mặc giáp đồng đỏ bảo vệ người tu khỏi chiến tranh và hung sát."},"associated_deities":["serkym_set","khadga"]},
       {"id":"deity_tsiu_marpo","system":"deity","name":{"vietnamese":"Xích Thiểm Dạ Xoa","sanskrit":"Tsiu Marpo","tibetan":"Tsiu Marpo"},"category_id":"dharmapala","polarity":"Nhanh như chớp","element":"Hỏa lôi phong ba","classification":"Chúa loài Tsen","bija":"BHYO","mantra_sanskrit":"Oṃ Tsiu Marpo Maraya Phaṭ","mantra_vi":"Ôm Si-u Mác-pô Ma-ra-ya Phạt","audio_url":"audio/mantra_tsiu_marpo.mp3","mudra":{"name":"Phong Mã Thần Tốc Ấn (Aśva-Śūla Mudrā)","gesture":"Cưỡi chiến mã đỏ phi qua mây đỏ, tay phải giơ cao ngọn giáo cờ đỏ, tay trái cầm thòng lọng","meaning":"Thần tốc giải cứu nguy nan, bảo vệ đạo tràng và tài sản"},"symbolism":{"core_meaning":"Cưỡi ngựa đỏ phi nhanh như chớp tiêu trừ chướng ngại người tu."},"associated_deities":["serkym_set","bhindi"]},
       {"id":"deity_dorje_legpa","system":"deity","name":{"vietnamese":"Kim Cang Thiện Tịch","sanskrit":"Vajrasadhu","tibetan":"Dorje Legpa"},"category_id":"dharmapala","polarity":"Hộ pháp rèn sắt","element":"Kim hỏa rực cháy","classification":"Hộ trì Terma","bija":"TRAṂ","mantra_sanskrit":"Oṃ Vajra Sādhu Hūṃ Phaṭ","mantra_vi":"Ôm Va-dza-ra Sa-đu Hum Phạt","audio_url":"audio/mantra_dorje_legpa.mp3","mudra":{"name":"Kim Cang Thiết Công Ấn (Ayasa-Mudgara Mudrā)","gesture":"Cưỡi dê chín sừng vặn xoắn, tay phải vung búa rèn; tay trái giữ ống bễ da hổ","meaning":"Hộ pháp thợ rèn luyện chảy ảo tưởng, gìn giữ giới Samaya và Terma"},"symbolism":{"core_meaning":"Thợ rèn thiêng rèn chảy mọi ảo tưởng, bảo hộ kho tàng Terma."},"associated_deities":["parashu","serkym_set"]},
       {"id":"deity_tilopa","system":"deity","name":{"vietnamese":"Đại Thành Tựu Giả Tilopa","sanskrit":"Tilopa","tibetan":"Tilopa"},"category_id":"guru","polarity":"Đại Thủ Ấn","element":"Pháp thân bất biến","classification":"Sơ Tổ Kagyu","bija":"A","mantra_sanskrit":"Oṃ Guru Tilopa Siddhi Hūṃ","mantra_vi":"Ôm Gu-ru Ti-lô-pa Sít-đi Hum","audio_url":"audio/mantra_tilopa.mp3","mudra":{"name":"Trực Chỉ Ngộ Tánh Ấn / Kích Ngư Ấn (Matsya-Mahāmudrā)","gesture":"Ngồi phóng khoáng trên da thú, tay phải giơ con cá quẫy, tay trái nâng Kapala","meaning":"Chỉ thẳng thực tại Đại Thủ Ấn Mahamudra vượt ngoài mọi quy ước"},"symbolism":{"core_meaning":"Chứng đắc Mahamudra trực tiếp từ Kim Cang Trì qua sự nghiệp ép hạt mè."},"associated_deities":["vajradhara","kapala"]},
@@ -324,7 +321,6 @@
       wealth: { label: "Đại Bổn Tôn & Thần Tài", system: "deity" }
     };
 
-    // TỌA ĐỘ MẠN-ĐÀ-LA (75 TÔN TƯỢNG)
     const MANDALA_COORDS = {
       "deity_shakyamuni": { layer: 0, r: 0, theta: 0, color: "#f59e0b" },
       "deity_vajradhara": { layer: 0, r: 40, theta: 180, color: "#60a5fa" },
@@ -403,9 +399,6 @@
       "deity_yeshe_tsogyal": { layer: 3, r: 285, theta: 130, color: "#f43f5e" }
     };
 
-    // ==========================================
-    // 2. BIẾN TOÀN CỤC & TIỆN ÍCH
-    // ==========================================
     let userImages = {};
     let userMudraImages = {};
     let currentTargetId = null;
@@ -458,6 +451,7 @@
     function playMantraAudio(audioUrl, deityId) {
       const audio = new Audio(audioUrl);
       const playPromise = audio.play();
+      
       if (playPromise !== undefined) {
         playPromise.catch(() => {
           if ('speechSynthesis' in window) {
@@ -465,12 +459,22 @@
             const item = VAJRAYANA_MASTER_DATA.find(x => x.id === deityId);
             const textToRead = item?.mantra_vi || item?.mantra_sanskrit || "Om Muni Muni Maha Muni Shakyamunaye Svaha";
             const utterance = new SpeechSynthesisUtterance(textToRead);
+            
+            const voices = window.speechSynthesis.getVoices();
+            const vietnameseVoice = voices.find(voice => voice.lang === 'vi-VN' || voice.lang.includes('vi'));
+            if (vietnameseVoice) {
+              utterance.voice = vietnameseVoice;
+            }
+
             utterance.lang = 'vi-VN';
-            utterance.rate = 0.82;
-            utterance.pitch = 0.85;
+            utterance.rate = 0.82; 
+            utterance.pitch = 0.9; 
 
             playChime(432, 'sine', 1.5);
-            setTimeout(() => { window.speechSynthesis.speak(utterance); }, 450);
+            setTimeout(() => { 
+              window.speechSynthesis.speak(utterance); 
+            }, 450);
+            
             utterance.onend = () => { playChime(528, 'sine', 1.8); };
           } else {
             playChime(432, 'sine', 2.5);
@@ -479,14 +483,12 @@
       }
     }
 
-    // ĐƯỜNG DẪN ẢNH TÔN TƯỢNG (.JPEG)
     function resolveImagePath(item) {
       if (userImages[item.id]) return userImages[item.id];
       const folder = item.system === 'phap_khi' ? 'phapkhi' : 'bo_ton';
       return `${folder}/${item.id}.jpeg`;
     }
 
-    // ĐƯỜNG DẪN ẢNH THỦ ẤN (CÁCH 1: THƯ MỤC thu_an/)
     function resolveMudraImagePath(item) {
       if (userMudraImages[item.id]) return userMudraImages[item.id];
       return `thu_an/${item.id}.jpeg`;
@@ -513,7 +515,6 @@
       imgElement.src = `https://placehold.co/200x200/0f172a/d97706?text=🤲+Thủ+Ấn`;
     }
 
-    // LIGHTBOX ZOOM MODAL
     function openZoomModal(imgSrc, event) {
       if (event) event.stopPropagation();
       const zoomModal = document.getElementById('imageZoomModal');
@@ -537,9 +538,6 @@
       }
     }
 
-    // ==========================================
-    // 3. LỌC & PHÂN TRANG HIỂN THỊ
-    // ==========================================
     function filterData() {
       const input = document.getElementById('searchInput');
       const query = input ? input.value.toLowerCase().trim() : '';
@@ -593,6 +591,19 @@
         const isDeity = item.system === 'deity';
         const activeImg = resolveImagePath(item);
 
+        let uploadButtonHtml = '';
+        if (!IS_SHARE_MODE) {
+          uploadButtonHtml = `
+            <button 
+              onclick="triggerSingleUpload('${item.id}', event)" 
+              class="absolute bottom-2 right-2 text-[10px] font-semibold bg-slate-900/90 hover:bg-amber-600 text-slate-200 hover:text-white border border-slate-700 px-2.5 py-1 rounded-lg transition shadow backdrop-blur"
+              title="Nạp hoặc đổi ảnh cho vị này"
+            >
+              📷 Nạp ảnh
+            </button>
+          `;
+        }
+
         card.innerHTML = `
           <div>
             <div class="h-52 w-full bg-slate-950 overflow-hidden relative border-b border-slate-800 flex items-center justify-center p-2 group/img">
@@ -608,15 +619,7 @@
               />
               <span class="absolute top-2 right-2 text-[10px] bg-black/75 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">${item.name.tibetan}</span>
               <span class="absolute top-2 left-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${isDeity ? 'bg-amber-950/80 text-amber-300 border-amber-500/40' : 'bg-teal-950/80 text-teal-300 border-teal-500/40'}">${isDeity ? 'Bổn Tôn' : 'Pháp Khí'}</span>
-              
-              <!-- Nút nạp ảnh riêng -->
-              <button 
-                onclick="triggerSingleUpload('${item.id}', event)" 
-                class="absolute bottom-2 right-2 text-[10px] font-semibold bg-slate-900/90 hover:bg-amber-600 text-slate-200 hover:text-white border border-slate-700 px-2.5 py-1 rounded-lg transition shadow backdrop-blur"
-                title="Nạp hoặc đổi ảnh cho vị này"
-              >
-                📷 Nạp ảnh
-              </button>
+              ${uploadButtonHtml}
             </div>
             
             <div class="p-3.5">
@@ -625,7 +628,6 @@
                 ${item.bija ? `<span class="bija-glow font-cinzel text-xs font-black text-amber-400 px-1 rounded bg-amber-950/40">${item.bija}</span>` : ''}
               </div>
 
-              <!-- HIỂN THỊ TÊN MÃ ID KÈM NÚT CHÉP NHANH -->
               <div class="flex items-center gap-1.5 mb-1.5">
                 <span class="text-[10px] font-mono bg-slate-950 text-amber-400 border border-slate-800 px-2 py-0.5 rounded select-all truncate max-w-[200px]">
                   (${item.id})
@@ -683,9 +685,6 @@
       }
     });
 
-    // ==========================================
-    // 4. MẠN-ĐÀ-LA VIEW
-    // ==========================================
     function renderMandalaNodes() {
       const container = document.getElementById('nodesContainer');
       if (!container) return;
@@ -750,9 +749,6 @@
       btn.onclick = () => openModal(item);
     }
 
-    // ==========================================
-    // 5. CHUỖI NIỆM MALA & MODAL CHI TIẾT
-    // ==========================================
     function getMalaData(id) {
       const s = localStorage.getItem(`mala_${id}`);
       return s ? JSON.parse(s) : { count: 0, rounds: 0 };
@@ -811,7 +807,6 @@
         }).join('');
       }
 
-      // Khối Chân Ngôn & Chuỗi Niệm
       let practiceHtml = '';
       if (isDeity && item.mantra_sanskrit) {
         practiceHtml = `
@@ -838,7 +833,6 @@
               <p class="text-xs sm:text-sm text-amber-300/90 font-medium italic select-all">${item.mantra_vi || 'Đang cập nhật phiên âm'}</p>
             </div>
 
-            <!-- Bộ đếm Mala -->
             <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
               <div class="flex-1">
                 <div class="flex justify-between text-xs text-slate-300 mb-1">
@@ -856,10 +850,18 @@
         `;
       }
 
-      // Khối Thủ Ấn Đặc Trưng (Mudrā) tích hợp ảnh từ thu_an/ và nút Nạp Ấn riêng
       let mudraHtml = '';
       if (isDeity && item.mudra) {
         const mudraImg = resolveMudraImagePath(item);
+        let uploadMudraBtnHtml = '';
+        if (!IS_SHARE_MODE) {
+          uploadMudraBtnHtml = `
+            <button onclick="triggerMudraUpload('${item.id}', event)" class="mt-2 w-full py-1 px-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-semibold transition flex items-center justify-center gap-1">
+              📷 Nạp Ấn
+            </button>
+          `;
+        }
+
         mudraHtml = `
           <div class="bg-slate-950/60 border border-amber-500/25 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-center">
             <div class="flex flex-col items-center">
@@ -867,9 +869,7 @@
                 <img src="${mudraImg}" alt="${item.mudra.name}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300" onerror="handleMudraFallback(this, item)" />
                 <span class="absolute bottom-1 bg-black/75 text-amber-300 text-[8px] px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">🔍 Phóng</span>
               </div>
-              <button onclick="triggerMudraUpload('${item.id}', event)" class="mt-2 w-full py-1 px-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-semibold transition flex items-center justify-center gap-1">
-                📷 Nạp Ấn
-              </button>
+              ${uploadMudraBtnHtml}
             </div>
             
             <div class="flex-1 space-y-1.5 text-xs text-slate-300 text-center sm:text-left">
@@ -884,6 +884,15 @@
         `;
       }
 
+      let modalUploadBtnHtml = '';
+      if (!IS_SHARE_MODE) {
+        modalUploadBtnHtml = `
+          <button onclick="triggerSingleUpload('${item.id}', event)" class="mt-2.5 w-full py-1.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1">
+            📷 Nạp / Đổi ảnh
+          </button>
+        `;
+      }
+
       content.innerHTML = `
         <div class="flex flex-col sm:flex-row gap-5 mb-4 items-center sm:items-start">
           <div class="w-48 flex flex-col items-center">
@@ -891,9 +900,7 @@
               <img id="modalImageDisplay" src="${activeImg}" alt="${item.name.vietnamese}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300" onerror="handleImageFallback(this, item)" />
               <span class="absolute top-2 left-2 bg-black/75 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/30 opacity-0 group-hover:opacity-100 transition-opacity">🔍 Phóng to</span>
             </div>
-            <button onclick="triggerSingleUpload('${item.id}', event)" class="mt-2.5 w-full py-1.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1">
-              📷 Nạp / Đổi ảnh
-            </button>
+            ${modalUploadBtnHtml}
           </div>
 
           <div class="flex-1 text-center sm:text-left">
@@ -904,7 +911,6 @@
             
             <h2 class="text-xl sm:text-2xl font-bold text-amber-400 leading-snug">${item.name.vietnamese}</h2>
             
-            <!-- HIỂN THỊ MÃ ID TRONG MODAL -->
             <div class="flex items-center justify-center sm:justify-start gap-2 my-1.5">
               <span class="text-xs font-mono bg-slate-950 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-lg select-all">
                 ${item.id}
@@ -955,11 +961,8 @@
       }
     }
 
-    // ==========================================
-    // 6. SAO LƯU & NẠP ẢNH
-    // ==========================================
     function exportBackupData() {
-      const payload = { version: "3.3", images: userImages, mudras: userMudraImages, mala: {} };
+      const payload = { version: "3.4", images: userImages, mudras: userMudraImages, mala: {} };
       VAJRAYANA_MASTER_DATA.forEach(i => {
         const m = localStorage.getItem(`mala_${i.id}`);
         if (m) payload.mala[i.id] = JSON.parse(m);
@@ -1057,7 +1060,6 @@
       e.target.value = '';
     }
 
-    // Xử lý nạp hàng loạt ảnh thủ ấn từ thư mục thu_an/
     function handleBatchMudraUpload(e) {
       const files = Array.from(e.target.files);
       let count = 0;
